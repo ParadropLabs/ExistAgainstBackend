@@ -1,0 +1,33 @@
+{
+  "name": "Riffle",
+  "version": "0.1.11",
+  "summary": "A short description of Riffle.",
+  "description": "",
+  "homepage": "https://github.com/<GITHUB_USERNAME>/Riffle",
+  "license": "MIT",
+  "authors": {
+    "Mickey Barboi": "damouse007@gmail.com"
+  },
+  "source": {
+    "git": "https://github.com/<GITHUB_USERNAME>/Riffle.git",
+    "tag": "0.1.11"
+  },
+  "requires_arc": true,
+  "source_files": "Pod/Classes/**/*",
+  "resource_bundles": {
+    "Riffle": [
+      "Pod/Assets/*.png"
+    ]
+  },
+  "dependencies": {
+    "SocketRocket": [
+
+    ],
+    "MPMessagePack": [
+
+    ],
+    "CocoaAsyncSocket": [
+
+    ]
+  }
+}

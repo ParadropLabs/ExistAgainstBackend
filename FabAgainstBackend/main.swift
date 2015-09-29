@@ -7,6 +7,9 @@
 //
 
 import Foundation
+import Riffle
 
-print("Hello, World!")
+setFabric("ws://ubuntu@ec2-52-26-83-61.us-west-2.compute.amazonaws.com:8000/ws")
+Session(pdid: "pd.demo.cardsagainst").connect()
+NSRunLoop.currentRunLoop().run()
 
