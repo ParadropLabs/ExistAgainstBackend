@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "1BFB1708EAF259C160AABF03AD367BE578A15EFD",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "1BFB1708EAF259C160AABF03AD367BE578A15EFD" : 0,
+    "AD7AC5A17FAB749ACCD47DB56B4914DBC2D25235" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "E9E754B4-63A0-42A3-8F18-167D1456E767",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "1BFB1708EAF259C160AABF03AD367BE578A15EFD" : "fabagainstbackend\/",
+    "AD7AC5A17FAB749ACCD47DB56B4914DBC2D25235" : "CardsAgainst\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "FabAgainstBackend",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "FabAgainstBackend.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:ParadropLabs\/ExistAgainstBackend.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "1BFB1708EAF259C160AABF03AD367BE578A15EFD"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:ParadropLabs\/ExisAgainst.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "AD7AC5A17FAB749ACCD47DB56B4914DBC2D25235"
+    }
+  ]
+}

@@ -87,19 +87,19 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
         _register(pdid, fn: cumin(fn))
     }
     
-    public func register<R>(pdid: String, _ fn: () -> (R))  {
+    public func register<R: AnyObject>(pdid: String, _ fn: () -> (R))  {
         _register(pdid, fn: cumin(fn))
     }
     
-    public func register<A, R>(pdid: String, _ fn: (A) -> (R))  {
+    public func register<A, R: AnyObject>(pdid: String, _ fn: (A) -> (R))  {
         _register(pdid, fn: cumin(fn))
     }
     
-    public func register<A, B, R>(pdid: String, _ fn: (A, B) -> (R))  {
+    public func register<A, B, R: AnyObject>(pdid: String, _ fn: (A, B) -> (R))  {
         _register(pdid, fn: cumin(fn))
     }
     
-    public func register<A, B, C, R>(pdid: String, _ fn: (A, B, C) -> (R))  {
+    public func register<A, B, C, R: AnyObject>(pdid: String, _ fn: (A, B, C) -> (R))  {
         _register(pdid, fn: cumin(fn))
     }
     
@@ -136,10 +136,8 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
     
     func _register(endpoint: String, fn: ([AnyObject]) -> ()) {
         session.registerRPC(endpoint, procedure: { (wamp: MDWamp!, invocation: MDWampInvocation!) -> Void in
-            
-            // WARNING- have to implement return!
+
             fn(invocation.arguments[0] as! [AnyObject])
-            
             wamp.resultForInvocation(invocation, arguments: [], argumentsKw: [:])
             
             }, cancelHandler: { () -> Void in
@@ -149,12 +147,11 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
         }
     }
     
-    func _register<R>(endpoint: String, fn: ([AnyObject]) -> (R)) {
+    func _register<R: AnyObject>(endpoint: String, fn: ([AnyObject]) -> (R)) {
         session.registerRPC(endpoint, procedure: { (wamp: MDWamp!, invocation: MDWampInvocation!) -> Void in
-            print("Someone called hello: ", invocation)
             
-            // WARNING- have to implement return!
-            fn(invocation.arguments[0] as! [AnyObject])
+            var result = fn(invocation.arguments[0] as! [AnyObject])
+            wamp.resultForInvocation(invocation, arguments: [result], argumentsKw: [:])
             
             }, cancelHandler: { () -> Void in
                 print("Register Cancelled!")
@@ -226,19 +223,19 @@ func cumin<A, B, C>(fn: (A, B, C) -> ()) -> ([AnyObject]) -> () {
     return { (args: [AnyObject]) in fn(args[0] as! A, args[1] as! B, args[2] as! C) }
 }
 
-func cumin<R>(fn: () -> (R)) -> ([AnyObject]) -> (R) {
+func cumin<R: AnyObject>(fn: () -> (R)) -> ([AnyObject]) -> (R) {
     return { (args: [AnyObject]) in fn() }
 }
 
-func cumin<A, R>(fn: (A) -> (R)) -> ([AnyObject]) -> (R) {
+func cumin<A, R: AnyObject>(fn: (A) -> (R)) -> ([AnyObject]) -> (R) {
     return { (args: [AnyObject]) in fn(args[0] as! A) }
 }
 
-func cumin<A, B, R>(fn: (A, B) -> (R)) -> ([AnyObject]) -> (R) {
+func cumin<A, B, R: AnyObject>(fn: (A, B) -> (R)) -> ([AnyObject]) -> (R) {
     return { (args: [AnyObject]) in fn(args[0] as! A, args[1] as! B) }
 }
 
-func cumin<A, B, C, R>(fn: (A, B, C) -> (R)) -> ([AnyObject]) -> (R) {
+func cumin<A, B, C, R: AnyObject>(fn: (A, B, C) -> (R)) -> ([AnyObject]) -> (R) {
     return { (args: [AnyObject]) in fn(args[0] as! A, args[1] as! B, args[2] as! C) }
 }
 

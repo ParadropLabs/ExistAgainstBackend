@@ -31,7 +31,7 @@ class Session: RiffleSession {
         register("pd.demo.cardsagainst/play", getRoom)
     }
     
-    func getRoom(player: String) -> [Int] {
+    func getRoom(player: String) -> AnyObject {
         // Assign the player to a room. Returns cards for the player
         let emptyRooms = rooms.filter { $0.players.count <= ROOM_CAP }
         var room: Room
