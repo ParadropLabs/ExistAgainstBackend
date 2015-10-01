@@ -16,6 +16,7 @@ class Session: RiffleSession {
     var rooms: [Room] = []
     
     // Maybe move this...
+    var q13Range = [0, ]
     var cardsQuestion13: [[String: AnyObject]] = []
     var cardsAnswer13: [[String: AnyObject]] = []
     var cardsQuestion21: [[String: AnyObject]] = []
@@ -49,5 +50,14 @@ class Session: RiffleSession {
 
 func loadCards(name: String) -> [[String: AnyObject]] {
     let jsonPath = NSBundle.mainBundle().pathForResource(name, ofType: "json")
-    return try! NSJSONSerialization.JSONObjectWithData(NSData(contentsOfFile: jsonPath!)!, options: NSJSONReadingOptions.AllowFragments) as! [[String: AnyObject]]
+    //let jsonPath = NSBundle.mainBundle().URLForResource(name, withExtension: "json")
+    //let man = NSFileManager.defaultManager().currentDirectoryPath
+    //print(man)
+    
+    print(jsonPath)
+    let x = try! NSJSONSerialization.JSONObjectWithData(NSData(contentsOfFile: jsonPath!)!, options: NSJSONReadingOptions.AllowFragments)
+    
+//    return [[:]]
+    
+    return x as! [[String: AnyObject]]
 }

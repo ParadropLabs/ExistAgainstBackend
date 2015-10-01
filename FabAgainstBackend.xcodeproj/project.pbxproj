@@ -10,18 +10,30 @@
 		50A3E9AB1BBB29C3002A3EBF /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A3E9AA1BBB29C3002A3EBF /* main.swift */; };
 		50A3E9BF1BBB4DDB002A3EBF /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A3E9BE1BBB4DDB002A3EBF /* Session.swift */; settings = {ASSET_TAGS = (); }; };
 		50A3E9C51BBB6BA3002A3EBF /* Room.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A3E9C41BBB6BA3002A3EBF /* Room.swift */; settings = {ASSET_TAGS = (); }; };
+		50F380401BBDB6A40028628B /* a13.json in Resources */ = {isa = PBXBuildFile; fileRef = 50F380331BBDA5C30028628B /* a13.json */; };
+		50F380411BBDB6A40028628B /* a21.json in Resources */ = {isa = PBXBuildFile; fileRef = 50F380341BBDA5C30028628B /* a21.json */; };
+		50F380421BBDB6A40028628B /* q13.json in Resources */ = {isa = PBXBuildFile; fileRef = 50F380351BBDA5C30028628B /* q13.json */; };
+		50F380431BBDB6A40028628B /* q21.json in Resources */ = {isa = PBXBuildFile; fileRef = 50F380361BBDA5C30028628B /* q21.json */; };
+		50F380441BBDB7010028628B /* a13.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 50F380331BBDA5C30028628B /* a13.json */; };
+		50F380451BBDB7010028628B /* a21.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 50F380341BBDA5C30028628B /* a21.json */; };
+		50F380461BBDB7010028628B /* q13.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 50F380351BBDA5C30028628B /* q13.json */; };
+		50F380471BBDB7010028628B /* q21.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 50F380361BBDA5C30028628B /* q21.json */; };
 		66BDF08C08D9C1F7EEFBBCC5 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6907D5F41DC0C7EB5E17803 /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		50A3E9A51BBB29C3002A3EBF /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 7;
 			files = (
+				50F380441BBDB7010028628B /* a13.json in CopyFiles */,
+				50F380451BBDB7010028628B /* a21.json in CopyFiles */,
+				50F380461BBDB7010028628B /* q13.json in CopyFiles */,
+				50F380471BBDB7010028628B /* q21.json in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -30,10 +42,10 @@
 		50A3E9AA1BBB29C3002A3EBF /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		50A3E9BE1BBB4DDB002A3EBF /* Session.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		50A3E9C41BBB6BA3002A3EBF /* Room.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Room.swift; sourceTree = "<group>"; };
-		50F37FF01BBBFB340028628B /* a13.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = a13.json; sourceTree = "<group>"; };
-		50F37FF11BBBFB340028628B /* a21.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = a21.json; sourceTree = "<group>"; };
-		50F37FF21BBBFB340028628B /* q13.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = q13.json; sourceTree = "<group>"; };
-		50F37FF31BBBFB340028628B /* q21.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = q21.json; sourceTree = "<group>"; };
+		50F380331BBDA5C30028628B /* a13.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = a13.json; sourceTree = "<group>"; };
+		50F380341BBDA5C30028628B /* a21.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = a21.json; sourceTree = "<group>"; };
+		50F380351BBDA5C30028628B /* q13.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = q13.json; sourceTree = "<group>"; };
+		50F380361BBDA5C30028628B /* q21.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = q21.json; sourceTree = "<group>"; };
 		561F77AFBC4CE41FB822EA45 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		AC268B56517A924661C84C7D /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		F6907D5F41DC0C7EB5E17803 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -83,10 +95,10 @@
 		50F37FEF1BBBFB290028628B /* Cards */ = {
 			isa = PBXGroup;
 			children = (
-				50F37FF01BBBFB340028628B /* a13.json */,
-				50F37FF11BBBFB340028628B /* a21.json */,
-				50F37FF21BBBFB340028628B /* q13.json */,
-				50F37FF31BBBFB340028628B /* q21.json */,
+				50F380331BBDA5C30028628B /* a13.json */,
+				50F380341BBDA5C30028628B /* a21.json */,
+				50F380351BBDA5C30028628B /* q13.json */,
+				50F380361BBDA5C30028628B /* q21.json */,
 			);
 			name = Cards;
 			sourceTree = "<group>";
@@ -120,6 +132,7 @@
 				50A3E9A41BBB29C3002A3EBF /* Frameworks */,
 				50A3E9A51BBB29C3002A3EBF /* CopyFiles */,
 				737AF5D3BBD55238B04C74B1 /* Copy Pods Resources */,
+				50F3803F1BBDB6970028628B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -160,6 +173,20 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		50F3803F1BBDB6970028628B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				50F380401BBDB6A40028628B /* a13.json in Resources */,
+				50F380411BBDB6A40028628B /* a21.json in Resources */,
+				50F380421BBDB6A40028628B /* q13.json in Resources */,
+				50F380431BBDB6A40028628B /* q21.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		1DB49676374B1B2593CB09E4 /* Check Pods Manifest.lock */ = {
@@ -293,6 +320,7 @@
 			baseConfigurationReference = 561F77AFBC4CE41FB822EA45 /* Pods.debug.xcconfig */;
 			buildSettings = {
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = NO;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -302,6 +330,7 @@
 			baseConfigurationReference = AC268B56517A924661C84C7D /* Pods.release.xcconfig */;
 			buildSettings = {
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = NO;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
