@@ -134,11 +134,15 @@ class Room {
         
         // TODO: ensure the player reported a legitmate pick-- remove the pick from the player's cards
         
-        session.publish(name + "/play/cancel", player.pick)
+        session.publish(name + "/play/picked", player.domain)
     }
     
     // MARK: Choosing
     func startChoosing() {
+        // publish the picks
+        let picks = players.map { $0.pick }
+        session.publish(name + "/round/choosing", picks)
+        
         state = .Choosing
         startTimer(CHOOSE_TIME, selector: "startScoring")
     }
@@ -164,7 +168,9 @@ class Room {
         if winner.count != 1 {
             print("No winner found, count: \(winner)")
             // TODO: all nil to be passed
+            
             session.publish(name + "/play/picked", "")
+            
         } else {
             session.publish(name + "/play/picked", winner[0].domain)
         }

@@ -50,6 +50,14 @@ class Card {
             "text": text
         ]
     }
+    
+    
+}
+
+extension Card: Equatable {
+    func == (lhs: Card, rhs: Card) -> Bool {
+        return lhs.id == rhs.id
+    }
 }
 
 class Deck {
@@ -126,4 +134,13 @@ func randomElement<T>(arr: [T]) -> T {
     return arr[Int(arc4random_uniform(UInt32(arr.count)))]
 }
 
+extension RangeReplaceableCollectionType where Generator.Element : Equatable {
+    
+    // Remove first collection element that is equal to the given `object`:
+    mutating func removeObject(object : Generator.Element) {
+        if let index = self.indexOf(object) {
+            self.removeAtIndex(index)
+        }
+    }
+}
 

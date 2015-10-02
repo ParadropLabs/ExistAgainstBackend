@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		507CA16F1BBEDCED004EBFF3 /* DemoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507CA16E1BBEDCED004EBFF3 /* DemoPlayer.swift */; settings = {ASSET_TAGS = (); }; };
 		50A3E9AB1BBB29C3002A3EBF /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A3E9AA1BBB29C3002A3EBF /* main.swift */; };
 		50A3E9BF1BBB4DDB002A3EBF /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A3E9BE1BBB4DDB002A3EBF /* Session.swift */; settings = {ASSET_TAGS = (); }; };
 		50A3E9C51BBB6BA3002A3EBF /* Room.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A3E9C41BBB6BA3002A3EBF /* Room.swift */; settings = {ASSET_TAGS = (); }; };
@@ -39,6 +40,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		507CA16E1BBEDCED004EBFF3 /* DemoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoPlayer.swift; sourceTree = "<group>"; };
 		50A3E9A71BBB29C3002A3EBF /* FabAgainstBackend */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FabAgainstBackend; sourceTree = BUILT_PRODUCTS_DIR; };
 		50A3E9AA1BBB29C3002A3EBF /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		50A3E9BE1BBB4DDB002A3EBF /* Session.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
@@ -90,6 +92,7 @@
 				50A3E9AA1BBB29C3002A3EBF /* main.swift */,
 				50A3E9BE1BBB4DDB002A3EBF /* Session.swift */,
 				50A3E9C41BBB6BA3002A3EBF /* Room.swift */,
+				507CA16E1BBEDCED004EBFF3 /* DemoPlayer.swift */,
 				50F380481BBDEF650028628B /* Shared.swift */,
 			);
 			path = FabAgainstBackend;
@@ -229,6 +232,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				507CA16F1BBEDCED004EBFF3 /* DemoPlayer.swift in Sources */,
 				50A3E9BF1BBB4DDB002A3EBF /* Session.swift in Sources */,
 				50A3E9C51BBB6BA3002A3EBF /* Room.swift in Sources */,
 				50F380491BBDEF650028628B /* Shared.swift in Sources */,

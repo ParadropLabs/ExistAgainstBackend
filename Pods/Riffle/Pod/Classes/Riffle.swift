@@ -25,7 +25,8 @@ public func setFabric(url: String) {
 public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
     var socket: MDWampTransportWebSocket
     var session: MDWamp
-    var domain: String
+    
+    public var domain: String
     
     public var delegate: RiffleDelegate?
     
