@@ -14,7 +14,7 @@ class Dummy: Player {
     
     func randomPick() -> Card {
         let card = randomElement(cards)
-        cards.removeObject(cards)
+        cards.removeObject(card)
         return card
     }
 }

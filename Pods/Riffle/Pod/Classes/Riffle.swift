@@ -26,7 +26,6 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
     var socket: MDWampTransportWebSocket
     var session: MDWamp
     
-    
     public var domain: String
     
     public var delegate: RiffleDelegate?

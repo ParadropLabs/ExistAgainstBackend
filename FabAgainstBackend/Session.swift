@@ -20,12 +20,8 @@ class Session: RiffleSession {
     
     override func onJoin() {
         register("pd.demo.cardsagainst/play", getRoom)
-        register("pd.demo.cardsagainst/Hi", hello)
     }
     
-    func hello() -> String {
-        return "Hello, World"
-    }
     func getRoom(player: NSString) -> AnyObject {
         // Assign the player to a room. Returns cards for the player
         

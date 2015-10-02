@@ -35,7 +35,7 @@ class Player {
     }
 }
 
-class Card {
+class Card: Equatable {
     var id: Int
     var text: String
     
@@ -50,15 +50,12 @@ class Card {
             "text": text
         ]
     }
-    
-    
 }
 
-extension Card: Equatable {
-    func == (lhs: Card, rhs: Card) -> Bool {
-        return lhs.id == rhs.id
-    }
+func ==(lhs: Card, rhs: Card) -> Bool {
+    return lhs.id == rhs.id
 }
+
 
 class Deck {
     var questions: [Card] = []
