@@ -33,66 +33,70 @@
 
 import Foundation
 
-enum State {
-    case Empty, Picking, Choosing, Scoring
-}
+let PICK_TIME = 10.0
+let CHOOSE_TIME = 5.0
+let SCORE_TIME = 2.0
+
+// a silly little hack until I get the prefixes in place
+let ID = "pd.demo.cardsagainst"
 
 
 class Room {
-    var name = randomStringWithLength(6)
+    var name = ID + "/room" + randomStringWithLength(6)
+    var deck: Deck
+    var state: State = .Empty
+    
     var players: [Player] = []
     var chooser: Player?
     var session: Session
-    var state: State = .Empty
-    var timer: AnyObject?
     
-    var questions: [[String: AnyObject]]
-    var answers: [[String: AnyObject]]
+    var timer: NSTimer?
     
     
-    init(session s: Session, questions q: [[String: AnyObject]], answers a: [[String: AnyObject]]) {
+    init(session s: Session, deck d: Deck) {
         session = s
-        questions = q
-        answers = a
+        deck = d
         
-        //subscribe playerLeft
+        session.register(name + "/leave", playerLeft)
     }
     
     
     // MARK: Player Changes
-    func addPlayer(id: String) -> [Int] {
-        // Called from main session when players arrive
-        // return room information to the player
-        // return cards to the player
+    func addPlayer(domain: String) -> [String: AnyObject] {
+        // Called from main session when player assigned to the room
+        // Returns the information the player needs to get up to date
         
-        // Assumes no duplicates, obviously
-        players.append(Player(pdid: id))
-        
-        //publish join
+        // TODO: Assumes no duplicates, obviously
+        players.append(Player(domain: domain))
+        session.publish(name + "/joined", domain)
         
         // Check if we have enough people to start playing
-        if players.count > 1 {
-            startPicking()
+        defer {
+            if players.count > 1 {
+                startPicking()
+            }
         }
         
-        // draw cards for the player
-        var hand: [Int] = []
-        for _ in 0...HAND_SIZE {
-            hand.append(randomElement(answers)["id"] as! Int)
-        }
-        
-        return hand
+        // Return the player's hand, the current players, and the current state
+        return [
+            "players": players.map { $0.toJson() },
+            "state" : String(state),
+            "hand" : deck.drawCards(deck.answers, number: HAND_SIZE).map { $0.json() },
+            "room" : name
+        ]
     }
     
-    func playerLeft(id: String) {
-        // get player that left
-        // If chooser, cancel and reassign
-        // Publish leave
+    func playerLeft(domain: String) {
+        // Check who the user is! If the chooser left we have to cancel or replace it with a demo user
+
+        session.publish(name + "/left", domain)
         
         // Make sure we have enough players to play
         if players.count < 2 {
-            //stop timer
-            //publish cancel
+            // This round is over, inform the players
+            // TODO
+            cancelTimer()
+            session.publish(name + "/play/cancel")
         }
     }
     
@@ -101,52 +105,52 @@ class Room {
     func startPicking() {
         state = .Picking
         
-        // reset picked state
-        _ = players.map { $0.pick = nil }
+        for player in players  {
+            player.pick = -1
+            session.call(player.domain + "/draw", deck.drawCards(deck.answers, number: 1)[0].json(), handler:nil)
+        }
         
-        // draw cards for players
-        
-        // choose next player in round robin
-        // chooser = chooser == nil ? players[0] : players[players.indexOf(chooser!) + 1 % players.count()]
-        
-        // session.publish("/room/round/", newChooser)
-        // Start timer
+        chooser = players[Int(arc4random_uniform(UInt32(players.count)))]
+        session.publish(name + "/round/picking", chooser!.domain)
+        startTimer(PICK_TIME, selector: "startChoosing")
     }
     
-    func pick(id: String, card: Int) {
+    func pick(domain: String, card: Int) {
         // Ensure state, throw exception
+        if state != .Picking {
+            print("ERROR: pick called in state \(state)")
+            return
+        }
         
         // get the player
-        let player = getPlayer(id)
+        let player = getPlayer(players, domain: domain)
         
-        if player.pick != nil {
+        if player.pick != -1 {
             print("Player has already picked a card.")
             return
         }
         
         player.pick = card
         
-        //remove card from player
+        // TODO: ensure the player reported a legitmate pick-- remove the pick from the player's cards
         
-        // publish picked
+        session.publish(name + "/play/cancel", player.pick)
     }
     
     // MARK: Choosing
     func startChoosing() {
         state = .Choosing
-        
-        // publish picks
-        // start timer
+        startTimer(CHOOSE_TIME, selector: "startScoring")
     }
     
-    func chose(id: String) {
-        // stop timer
-        startScoring(getPlayer(id))
+    func chose(domain: String) {
+        cancelTimer()
+        startScoring(getPlayer(players, domain: domain))
     }
     
     
     //MARK: Scoring
-    func startScoring(player: Player?) {
+    func startScoring(player: Player? = nil) {
         state = .Scoring
         
         if let p = player {
@@ -155,58 +159,31 @@ class Room {
         
         // if called with nil, no one chose. Else publish the winner.
         // publish scoring
+        let winner = players.filter({ $0.pick != -1 })
         
-        // start timer
-    }
-    
-    
-    // MARK: Utils
-    func getPlayer(id: String) -> Player {
-        return players.filter({$0.id == id})[0]
-    }
-    
-    func drawCards(number: Int) -> [Int] {
-        // draws a number of cards for the player. Tracks duplicates (?)
-        var ret: [Int] = []
-        
-        let TEMPCARDS = [1, 2, 3]
-        
-        for _ in 0...number {
-            ret.append(randomElement(TEMPCARDS))
+        if winner.count != 1 {
+            print("No winner found, count: \(winner)")
+            // TODO: all nil to be passed
+            session.publish(name + "/play/picked", "")
+        } else {
+            session.publish(name + "/play/picked", winner[0].domain)
         }
         
-        return ret
+        startTimer(SCORE_TIME, selector: "startPicking")
+    }
+    
+    
+    //MARK: Utils
+    func startTimer(time: NSTimeInterval, selector: String) {
+        timer = NSTimer(timeInterval: time, target: self, selector: Selector(selector), userInfo: nil, repeats: false)
+    }
+    
+    func cancelTimer() {
+        if let t = timer {
+            t.invalidate()
+            timer = nil
+        }
     }
 }
 
 
-class Player {
-    var id: String
-    var score = 0
-    var pick: Int?
-    
-    init(pdid: String) {
-        id = pdid
-    }
-}
-
-
-// Utility function to generate random strings
-func randomStringWithLength (len : Int) -> NSString {
-    
-    let letters : NSString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    let randomString : NSMutableString = NSMutableString(capacity: len)
-    
-    for (var i=0; i < len; i++){
-        let length = UInt32 (letters.length)
-        let rand = arc4random_uniform(length)
-        randomString.appendFormat("%C", letters.characterAtIndex(Int(rand)))
-    }
-    
-    return randomString
-}
-
-func randomElement<T>(arr: [T]) -> T {
-    // returns a random element from an array
-    return arr[Int(arc4random_uniform(UInt32(arr.count)))]
-}

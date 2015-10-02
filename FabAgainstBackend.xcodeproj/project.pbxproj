@@ -18,6 +18,7 @@
 		50F380451BBDB7010028628B /* a21.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 50F380341BBDA5C30028628B /* a21.json */; };
 		50F380461BBDB7010028628B /* q13.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 50F380351BBDA5C30028628B /* q13.json */; };
 		50F380471BBDB7010028628B /* q21.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 50F380361BBDA5C30028628B /* q21.json */; };
+		50F380491BBDEF650028628B /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F380481BBDEF650028628B /* Shared.swift */; settings = {ASSET_TAGS = (); }; };
 		66BDF08C08D9C1F7EEFBBCC5 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6907D5F41DC0C7EB5E17803 /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -46,6 +47,7 @@
 		50F380341BBDA5C30028628B /* a21.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = a21.json; sourceTree = "<group>"; };
 		50F380351BBDA5C30028628B /* q13.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = q13.json; sourceTree = "<group>"; };
 		50F380361BBDA5C30028628B /* q21.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = q21.json; sourceTree = "<group>"; };
+		50F380481BBDEF650028628B /* Shared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Shared.swift; sourceTree = "<group>"; };
 		561F77AFBC4CE41FB822EA45 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		AC268B56517A924661C84C7D /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		F6907D5F41DC0C7EB5E17803 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -88,6 +90,7 @@
 				50A3E9AA1BBB29C3002A3EBF /* main.swift */,
 				50A3E9BE1BBB4DDB002A3EBF /* Session.swift */,
 				50A3E9C41BBB6BA3002A3EBF /* Room.swift */,
+				50F380481BBDEF650028628B /* Shared.swift */,
 			);
 			path = FabAgainstBackend;
 			sourceTree = "<group>";
@@ -228,6 +231,7 @@
 			files = (
 				50A3E9BF1BBB4DDB002A3EBF /* Session.swift in Sources */,
 				50A3E9C51BBB6BA3002A3EBF /* Room.swift in Sources */,
+				50F380491BBDEF650028628B /* Shared.swift in Sources */,
 				50A3E9AB1BBB29C3002A3EBF /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

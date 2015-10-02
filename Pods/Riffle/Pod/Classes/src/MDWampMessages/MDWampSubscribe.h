@@ -20,6 +20,7 @@
 
 #import <Foundation/Foundation.h>
 #import "MDWampMessage.h"
+
 // [SUBSCRIBE, Request|id, Options|dict, Topic|uri]
 @interface MDWampSubscribe : NSObject <MDWampMessage>
 @property (nonatomic, strong) NSNumber *request;
