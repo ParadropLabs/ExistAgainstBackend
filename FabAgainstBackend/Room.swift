@@ -105,6 +105,7 @@ class Room {
     func startPicking() {
         state = .Picking
         
+        // TODO: the chooser from the last round should not get a card (no burn)
         for player in players  {
             player.pick = -1
             session.call(player.domain + "/draw", deck.drawCards(deck.answers, number: 1)[0].json(), handler:nil)
@@ -137,10 +138,12 @@ class Room {
         session.publish(name + "/play/picked", player.domain)
     }
     
+    
     // MARK: Choosing
     func startChoosing() {
-        // publish the picks
-        let picks = players.map { $0.pick }
+        // publish the picks-- with mantle changes this should turn into direct object transference
+        
+        let picks = players.map { [$0.domain: $0.pick] }
         session.publish(name + "/round/choosing", picks)
         
         state = .Choosing
@@ -169,10 +172,10 @@ class Room {
             print("No winner found, count: \(winner)")
             // TODO: all nil to be passed
             
-            session.publish(name + "/play/picked", "")
+            session.publish(name + "/round/scoring", "")
             
         } else {
-            session.publish(name + "/play/picked", winner[0].domain)
+            session.publish(name + "/round/scoring", winner[0].domain)
         }
         
         startTimer(SCORE_TIME, selector: "startPicking")

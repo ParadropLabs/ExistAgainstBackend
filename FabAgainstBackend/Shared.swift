@@ -10,7 +10,7 @@
 import Foundation
 
 // Representation of a player in the game
-class Player {
+class Player: Equatable {
     var domain: String
     var score = 0
     var pick: Int
@@ -54,6 +54,10 @@ class Card: Equatable {
 
 func ==(lhs: Card, rhs: Card) -> Bool {
     return lhs.id == rhs.id
+}
+
+func ==(lhs: Player, rhs: Player) -> Bool {
+    return lhs.domain == rhs.domain
 }
 
 
