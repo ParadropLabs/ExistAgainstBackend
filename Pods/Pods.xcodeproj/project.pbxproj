@@ -57,6 +57,7 @@
 		49305EA1A411994965E73A07D32DCEAD /* cmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 62A5D0E51A80C5BD00BDAA1C3985F133 /* cmp.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4AF9B49515DEFA46168803F8397AD4C7 /* NSString+MDString.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D4180C6D425AE052A13FD5C071F2280 /* NSString+MDString.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
 		4C43A90AA1E8F520B5D64FDBFF306B06 /* SocketRocket-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 85962C6624CBCD1120531969BA52B2D1 /* SocketRocket-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5054EB441BBF3A5600ECF4F1 /* RFProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5054EB431BBF3A5600ECF4F1 /* RFProtocol.swift */; settings = {ASSET_TAGS = (); }; };
 		53BA157593E85F19FCA3EF268CFD0F5E /* MPXPCClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 88595523B15799ED30565C81AC6E118B /* MPXPCClient.m */; };
 		55A2F995FE740AB108DC3563BADA8E26 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 940021EAFB503D5BABFDC9B14CFE8F52 /* Cocoa.framework */; };
 		5781094279CF65135AC5D0F34F492DF3 /* MDWampGoodbye.m in Sources */ = {isa = PBXBuildFile; fileRef = 232C250D29D45245D46436F933CC7ADE /* MDWampGoodbye.m */; settings = {COMPILER_FLAGS = "-DOS_OBJECT_USE_OBJC=0"; }; };
@@ -273,6 +274,7 @@
 		4F7FB79ED338FF0A3C305902538A26C5 /* CocoaAsyncSocket.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CocoaAsyncSocket.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		501CA04832ECE3085F164B146C63B3F3 /* Riffle.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Riffle.xcconfig; sourceTree = "<group>"; };
 		5030EDF1664331401E09AC6D19E79FE9 /* GHODictionary-Private.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "GHODictionary-Private.xcconfig"; sourceTree = "<group>"; };
+		5054EB431BBF3A5600ECF4F1 /* RFProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RFProtocol.swift; sourceTree = "<group>"; };
 		505A571AA7AA7CB1B4C956F00F46349D /* MDWampTransportRawSocket.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MDWampTransportRawSocket.h; path = Pod/Classes/src/MDWampTransports/MDWampTransportRawSocket.h; sourceTree = "<group>"; };
 		51E42B95AB855C079F09BDB164FA100D /* MDWampPublish.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = MDWampPublish.m; path = Pod/Classes/src/MDWampMessages/MDWampPublish.m; sourceTree = "<group>"; };
 		532510533FA666D4A5CE145E7E49DB24 /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GCDAsyncUdpSocket.m; path = Source/GCD/GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
@@ -723,6 +725,7 @@
 				9D4180C6D425AE052A13FD5C071F2280 /* NSString+MDString.m */,
 				1775BCE0E12BAA88091D370794CDDA9A /* Riffle.h */,
 				1AB9A75660B78DD8AC25BF21CC160083 /* Riffle.swift */,
+				5054EB431BBF3A5600ECF4F1 /* RFProtocol.swift */,
 				FDB2D18D9DC92C87D1CF4819F8C9729E /* Support Files */,
 			);
 			path = Riffle;
@@ -1089,6 +1092,7 @@
 				4AF9B49515DEFA46168803F8397AD4C7 /* NSString+MDString.m in Sources */,
 				035CC533794C35B7BACA093DC70A7025 /* Riffle-dummy.m in Sources */,
 				F354A33524E6A9BB699208DFE6FECA7B /* Riffle.swift in Sources */,
+				5054EB441BBF3A5600ECF4F1 /* RFProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

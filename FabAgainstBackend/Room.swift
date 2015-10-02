@@ -46,23 +46,27 @@ class Room {
     var deck: Deck
     var state: State = .Empty
     
+    var demoPlayer: Player?
     var players: [Player] = []
     var chooser: Player?
     var session: Session
     
     var timer: NSTimer?
-    
+    var question: Card?
     
     init(session s: Session, deck d: Deck) {
         session = s
         deck = d
         
         session.register(name + "/leave", playerLeft)
+        session.register(name + "/play/pick", pick)
+        session.subscribe(name + "/play/choose", choose)
     }
     
     
     // MARK: Player Changes
     func addPlayer(domain: String) -> [String: AnyObject] {
+        print("Adding Player")
         // Called from main session when player assigned to the room
         // Returns the information the player needs to get up to date
         
@@ -70,8 +74,14 @@ class Room {
         players.append(Player(domain: domain))
         session.publish(name + "/joined", domain)
         
-        // Check if we have enough people to start playing
+        
+        // If there are not enough players to begin play, inject a demo player
+        // DEFER
         defer {
+//            if players.count == 1 {
+//                let ret = addPlayer("pd.demo.cardsagainst.demo")
+//                startPicking()
+//            }
             if players.count > 1 {
                 startPicking()
             }
@@ -86,7 +96,12 @@ class Room {
         ]
     }
     
+    func checkDemo() {
+
+    }
+    
     func playerLeft(domain: String) {
+        print("Player left: " + domain)
         // Check who the user is! If the chooser left we have to cancel or replace it with a demo user
 
         session.publish(name + "/left", domain)
@@ -103,7 +118,10 @@ class Room {
     
     // MARK: Picking
     func startPicking() {
+        print("STATE: Picking")
         state = .Picking
+        
+        // TODO: clean up demo players sticking around that we no longer need
         
         // TODO: the chooser from the last round should not get a card (no burn)
         for player in players  {
@@ -111,12 +129,16 @@ class Room {
             session.call(player.domain + "/draw", deck.drawCards(deck.answers, number: 1)[0].json(), handler:nil)
         }
         
+        question = deck.drawCards(deck.questions, number: 1)[0]
+        
         chooser = players[Int(arc4random_uniform(UInt32(players.count)))]
-        session.publish(name + "/round/picking", chooser!.domain)
+        session.publish(name + "/round/picking", chooser!.domain, question!.json())
         startTimer(PICK_TIME, selector: "startChoosing")
     }
     
     func pick(domain: String, card: Int) {
+        print("Player \(domain) picked \(card)")
+        
         // Ensure state, throw exception
         if state != .Picking {
             print("ERROR: pick called in state \(state)")
@@ -141,6 +163,8 @@ class Room {
     
     // MARK: Choosing
     func startChoosing() {
+        print("STATE: choosing")
+        
         // publish the picks-- with mantle changes this should turn into direct object transference
         
         let picks = players.map { [$0.domain: $0.pick] }
@@ -150,7 +174,9 @@ class Room {
         startTimer(CHOOSE_TIME, selector: "startScoring")
     }
     
-    func chose(domain: String) {
+    func choose(domain: String) {
+        print("Chooser choose winner: " + domain)
+        
         cancelTimer()
         startScoring(getPlayer(players, domain: domain))
     }
@@ -158,6 +184,8 @@ class Room {
     
     //MARK: Scoring
     func startScoring(player: Player? = nil) {
+        print("STATE: scoring")
+        
         state = .Scoring
         
         if let p = player {

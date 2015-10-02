@@ -33,31 +33,31 @@
 
 @interface MDWamp () <MDWampTransportDelegate, NSURLConnectionDelegate>
 
-@property (nonatomic, assign) BOOL explicitSessionClose;
-@property (nonatomic, strong) id<MDWampTransport> transport;
-@property (nonatomic, strong) id<MDWampSerialization> serializator;
-@property (nonatomic, strong) NSString *realm;
-@property (nonatomic, assign) BOOL sessionEstablished;
-@property (nonatomic, assign) BOOL goodbyeSent;
-
-@property (nonatomic, strong) NSMutableDictionary *subscriptionRequests;
-@property (nonatomic, strong) NSMutableDictionary *subscriptionEvents;
-@property (nonatomic, strong) NSMutableDictionary *subscriptionID;
-
-@property (nonatomic, strong) NSMutableDictionary *publishRequests;
-
-@property (nonatomic, strong) NSMutableDictionary *rpcCallbackMap;
-
-@property (nonatomic, strong) NSMutableDictionary *rpcRegisterRequests;
-@property (nonatomic, strong) NSMutableDictionary *rpcUnregisterRequests;
-@property (nonatomic, strong) NSMutableDictionary *rpcRegisteredUri;
-@property (nonatomic, strong) NSMutableDictionary *rpcRegisteredProcedures;
-
-@property (nonatomic, strong) NSMutableDictionary *rpcPendingInvocation;
-
-@property (nonatomic, strong) NSTimer *hbTimer;
-@property (nonatomic, assign) int hbIncomingSeq;
-@property (nonatomic, assign) int hbOutgoingSeq;
+//@property (nonatomic, assign) BOOL explicitSessionClose;
+//@property (nonatomic, strong) id<MDWampTransport> transport;
+//@property (nonatomic, strong) id<MDWampSerialization> serializator;
+//@property (nonatomic, strong) NSString *realm;
+//@property (nonatomic, assign) BOOL sessionEstablished;
+//@property (nonatomic, assign) BOOL goodbyeSent;
+//
+//@property (nonatomic, strong) NSMutableDictionary *subscriptionRequests;
+//@property (nonatomic, strong) NSMutableDictionary *subscriptionEvents;
+//@property (nonatomic, strong) NSMutableDictionary *subscriptionID;
+//
+//@property (nonatomic, strong) NSMutableDictionary *publishRequests;
+//
+//@property (nonatomic, strong) NSMutableDictionary *rpcCallbackMap;
+//
+//@property (nonatomic, strong) NSMutableDictionary *rpcRegisterRequests;
+//@property (nonatomic, strong) NSMutableDictionary *rpcUnregisterRequests;
+//@property (nonatomic, strong) NSMutableDictionary *rpcRegisteredUri;
+//@property (nonatomic, strong) NSMutableDictionary *rpcRegisteredProcedures;
+//
+//@property (nonatomic, strong) NSMutableDictionary *rpcPendingInvocation;
+//
+//@property (nonatomic, strong) NSTimer *hbTimer;
+//@property (nonatomic, assign) int hbIncomingSeq;
+//@property (nonatomic, assign) int hbOutgoingSeq;
 
 @end
 

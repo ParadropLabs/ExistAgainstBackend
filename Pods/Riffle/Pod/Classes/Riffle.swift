@@ -24,8 +24,7 @@ public func setFabric(url: String) {
 
 public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
     var socket: MDWampTransportWebSocket
-    var session: MDWamp
-    
+    var session: RFProtocol
     public var domain: String
     
     public var delegate: RiffleDelegate?
@@ -35,10 +34,10 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
         socket = MDWampTransportWebSocket(server:NSURL(string: NODE), protocolVersions:[kMDWampProtocolWamp2msgpack, kMDWampProtocolWamp2json])
         domain = d
         // Oh, the hacks you'll see
-        session = MDWamp()
+        session = RFProtocol()
         super.init()
         
-        session = MDWamp(transport: socket, realm: domain, delegate: self)
+        session = RFProtocol(transport: socket, realm: domain, delegate: self)
     }
     
     public func connect() {
@@ -195,8 +194,13 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
         //        let a = args[0] as! NSArray
         //        let b = a[0] as! NSArray
         //        return b as [AnyObject]
+       self 
     }
 }
+
+////////////////////
+// Playing With Conversions
+////////////////////
 
 
 ////////////////////
@@ -247,50 +251,6 @@ func cumin<A, B, C, R: AnyObject>(fn: (A, B, C) -> (R)) -> ([AnyObject]) -> (R) 
 }
 
 
-
-/////////////////
-// *None
-/////////////////
-
-//// NoneNone
-//
-//func cumin(fn: () -> ()) -> ([AnyObject]) -> () {
-//    return { (args: [AnyObject]) in fn() }
-//}
-//
-//// OneNone
-//func cumin<A>(fn: A -> ()) -> ([AnyObject]) -> () {
-//    return { (args: [AnyObject]) in fn(args[0] as! A) }
-//}
-//
-//
-//// TwoNone
-//func cumin<A, B>(fn: (A, B) -> ()) -> ([AnyObject]) -> () {
-//    return { (args: [AnyObject]) -> () in fn(args[0] as! A, args[1] as! B) }
-//}
-//
-//// ThreeNone
-//func cumin<A, B, C>(fn: (A, B, C) -> ()) -> ([AnyObject]) -> () {
-//    return { (args: [AnyObject]) -> () in fn(args[0] as! A, args[2] as! B, args[3] as! C) }
-//}
-//
-///////////////////
-//// *One
-///////////////////
-//// OneOne
-//func cumin<A, R>(fn: A -> R) -> ([AnyObject]) -> R {
-//    return { (args: [AnyObject]) -> R in fn(args[0] as! A) }
-//}
-//
-//// TwoOne
-//func cumin<A, B, R>(fn: (A, B) -> R) -> ([AnyObject]) -> R {
-//    return { (args: [AnyObject]) -> R in fn(args[0] as! A, args[1] as! B) }
-//}
-//
-//// ThreeOne
-//func cumin<A, B, C, R>(fn: (A, B, C) -> R) -> ([AnyObject]) -> R {
-//    return { (args: [AnyObject]) -> R in fn(args[0] as! A, args[1] as! B, args[2] as! C) }
-//}
 
 
 
