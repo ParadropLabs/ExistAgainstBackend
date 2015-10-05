@@ -90,6 +90,8 @@ class Room: NSObject {
             // Wait a second to start picking
             if players.count > 1 {
                 startTimer(EMPTY_TIME, selector: "startPicking")
+            } else {
+                print("Not enough players to start play. Waiting")
             }
         }
         
