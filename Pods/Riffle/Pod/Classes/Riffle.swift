@@ -24,7 +24,7 @@ public func setFabric(url: String) {
 
 public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
     var socket: MDWampTransportWebSocket
-    var session: RFProtocol
+    var session: MDWamp
     public var domain: String
     
     public var delegate: RiffleDelegate?
@@ -34,10 +34,10 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
         socket = MDWampTransportWebSocket(server:NSURL(string: NODE), protocolVersions:[kMDWampProtocolWamp2msgpack, kMDWampProtocolWamp2json])
         domain = d
         // Oh, the hacks you'll see
-        session = RFProtocol()
+        session = MDWamp()
         super.init()
         
-        session = RFProtocol(transport: socket, realm: domain, delegate: self)
+        session = MDWamp(transport: socket, realm: domain, delegate: self)
     }
     
     public func connect() {
@@ -128,7 +128,7 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
         // This is the real subscrive method
         session.subscribe(endpoint, onEvent: { (event: MDWampEvent!) -> Void in
             // Trigger the callback
-            fn(event.arguments[0] as! [AnyObject])
+            fn(event.arguments)
             
             }) { (err: NSError!) -> Void in
                 if let e = err {
@@ -140,26 +140,26 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
     func _register(endpoint: String, fn: ([AnyObject]) -> ()) {
         session.registerRPC(endpoint, procedure: { (wamp: MDWamp!, invocation: MDWampInvocation!) -> Void in
             
-            fn(invocation.arguments[0] as! [AnyObject])
+            fn(invocation.arguments)
             wamp.resultForInvocation(invocation, arguments: [], argumentsKw: [:])
             
             }, cancelHandler: { () -> Void in
                 print("Register Cancelled!")
             }) { (err: NSError!) -> Void in
-                print("Registration completed.")
+                print("Registration completed: \(endpoint)")
         }
     }
     
     func _register<R: AnyObject>(endpoint: String, fn: ([AnyObject]) -> (R)) {
         session.registerRPC(endpoint, procedure: { (wamp: MDWamp!, invocation: MDWampInvocation!) -> Void in
             
-            var result = fn(invocation.arguments as! [AnyObject])
+            let result = fn(invocation.arguments)
             wamp.resultForInvocation(invocation, arguments: [result], argumentsKw: [:])
             
             }, cancelHandler: { () -> Void in
                 print("Register Cancelled!")
             }) { (err: NSError!) -> Void in
-                print("Registration completed.")
+                print("Registration completed: \(endpoint)")
         }
     }
     
@@ -194,13 +194,8 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
         //        let a = args[0] as! NSArray
         //        let b = a[0] as! NSArray
         //        return b as [AnyObject]
-       self 
     }
 }
-
-////////////////////
-// Playing With Conversions
-////////////////////
 
 
 ////////////////////
@@ -251,6 +246,50 @@ func cumin<A, B, C, R: AnyObject>(fn: (A, B, C) -> (R)) -> ([AnyObject]) -> (R) 
 }
 
 
+
+/////////////////
+// *None
+/////////////////
+
+//// NoneNone
+//
+//func cumin(fn: () -> ()) -> ([AnyObject]) -> () {
+//    return { (args: [AnyObject]) in fn() }
+//}
+//
+//// OneNone
+//func cumin<A>(fn: A -> ()) -> ([AnyObject]) -> () {
+//    return { (args: [AnyObject]) in fn(args[0] as! A) }
+//}
+//
+//
+//// TwoNone
+//func cumin<A, B>(fn: (A, B) -> ()) -> ([AnyObject]) -> () {
+//    return { (args: [AnyObject]) -> () in fn(args[0] as! A, args[1] as! B) }
+//}
+//
+//// ThreeNone
+//func cumin<A, B, C>(fn: (A, B, C) -> ()) -> ([AnyObject]) -> () {
+//    return { (args: [AnyObject]) -> () in fn(args[0] as! A, args[2] as! B, args[3] as! C) }
+//}
+//
+///////////////////
+//// *One
+///////////////////
+//// OneOne
+//func cumin<A, R>(fn: A -> R) -> ([AnyObject]) -> R {
+//    return { (args: [AnyObject]) -> R in fn(args[0] as! A) }
+//}
+//
+//// TwoOne
+//func cumin<A, B, R>(fn: (A, B) -> R) -> ([AnyObject]) -> R {
+//    return { (args: [AnyObject]) -> R in fn(args[0] as! A, args[1] as! B) }
+//}
+//
+//// ThreeOne
+//func cumin<A, B, C, R>(fn: (A, B, C) -> R) -> ([AnyObject]) -> R {
+//    return { (args: [AnyObject]) -> R in fn(args[0] as! A, args[1] as! B, args[2] as! C) }
+//}
 
 
 

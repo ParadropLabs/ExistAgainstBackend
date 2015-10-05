@@ -36,12 +36,13 @@ import Foundation
 let PICK_TIME = 10.0
 let CHOOSE_TIME = 5.0
 let SCORE_TIME = 2.0
+let EMPTY_TIME = 1.0
 
 // a silly little hack until I get the prefixes in place
 let ID = "pd.demo.cardsagainst"
 
 
-class Room {
+class Room: NSObject {
     var name = ID + "/room" + randomStringWithLength(6)
     var deck: Deck
     var state: State = .Empty
@@ -54,9 +55,12 @@ class Room {
     var timer: NSTimer?
     var question: Card?
     
+    
     init(session s: Session, deck d: Deck) {
         session = s
         deck = d
+        
+        super.init()
         
         session.register(name + "/leave", playerLeft)
         session.register(name + "/play/pick", pick)
@@ -82,8 +86,10 @@ class Room {
 //                let ret = addPlayer("pd.demo.cardsagainst.demo")
 //                startPicking()
 //            }
+            
+            // Wait a second to start picking
             if players.count > 1 {
-                startPicking()
+                startTimer(EMPTY_TIME, selector: "startPicking")
             }
         }
         
@@ -156,6 +162,7 @@ class Room {
         player.pick = card
         
         // TODO: ensure the player reported a legitmate pick-- remove the pick from the player's cards
+        // and check the card exists in the first place
         
         session.publish(name + "/play/picked", player.domain)
     }
@@ -165,45 +172,73 @@ class Room {
     func startChoosing() {
         print("STATE: choosing")
         
+        // Autoassign picks for the user if they had not yet submitted
+        // TODO: inform them off the autopick
+        //for p in players {
+        //    if p.pick == -1 {
+        //        p.pick = randomElement(deck.answers).id
+        //    }
+        //}
+        
         // publish the picks-- with mantle changes this should turn into direct object transference
         
-        let picks = players.map { [$0.domain: $0.pick] }
-        session.publish(name + "/round/choosing", picks)
+        // get the cards from the ids of the picks
+        var ret : [AnyObject] = []
+        for p in players {
+            let cards = deck.answers.filter {$0.id == p.pick }
+            
+            if cards.count == 1 {
+                ret.append(cards[0].json())
+            }
+        }
+        
+        session.publish(name + "/round/choosing", ret)
         
         state = .Choosing
-        startTimer(CHOOSE_TIME, selector: "startScoring")
+        startTimer(CHOOSE_TIME, selector: "startScoring:")
     }
     
     func choose(domain: String) {
-        print("Chooser choose winner: " + domain)
-        
+        print("Winner choosen: " + domain)
         cancelTimer()
-        startScoring(getPlayer(players, domain: domain))
+        startTimer(0.0, selector: "startScoring", info: domain)
     }
     
     
     //MARK: Scoring
-    func startScoring(player: Player? = nil) {
+    func startScoring(timer: NSTimer) {
         print("STATE: scoring")
-        
         state = .Scoring
         
-        if let p = player {
-            p.score += 1
-        }
-        
-        // if called with nil, no one chose. Else publish the winner.
-        // publish scoring
-        let winner = players.filter({ $0.pick != -1 })
-        
-        if winner.count != 1 {
-            print("No winner found, count: \(winner)")
-            // TODO: all nil to be passed
+        // if nil, no player was choosen. Autochoose one.
+        var player: Player?
+        if let info = timer.userInfo {
+            let domain = info as! String
+            let filters = players.filter { $0.domain == domain }
             
-            session.publish(name + "/round/scoring", "")
+            // Make sure we weren't lied to
+            if filters.count != 1 {
+                print("ERR: submission \(domain) not found in players!")
+            } else {
+                player = filters[0]
+            }
             
         } else {
-            session.publish(name + "/round/scoring", winner[0].domain)
+            let submitted = players.filter { $0.pick != -1 }
+            
+            if submitted.count != 0 {
+                print("No player choosen. Selecting one at random from those that submitted")
+                player = randomElement(submitted)
+            }
+        }
+        
+        // We have a winner or not. Publish.
+        if let p = player {
+            p.score += 1
+            session.publish(name + "/round/scoring", p.domain)
+        } else {
+            print("No players picked cards! No winers found. ")
+            session.publish(name + "/round/scoring", "")
         }
         
         startTimer(SCORE_TIME, selector: "startPicking")
@@ -211,8 +246,9 @@ class Room {
     
     
     //MARK: Utils
-    func startTimer(time: NSTimeInterval, selector: String) {
-        timer = NSTimer(timeInterval: time, target: self, selector: Selector(selector), userInfo: nil, repeats: false)
+    func startTimer(time: NSTimeInterval, selector: String, info: AnyObject? = nil) {
+        print("Starting timer for \(time) on \(selector)")
+        timer = NSTimer.scheduledTimerWithTimeInterval(time, target: self, selector: Selector(selector), userInfo: nil, repeats: false)
     }
     
     func cancelTimer() {

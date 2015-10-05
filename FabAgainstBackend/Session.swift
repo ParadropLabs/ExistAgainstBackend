@@ -35,6 +35,10 @@ class Session: RiffleSession {
             room = emptyRooms[Int(arc4random_uniform(UInt32(emptyRooms.count)))]
         }
         
-        return room.addPlayer(player as String)
+        // very strange exec_bad_access if you just return the element right away. 
+        // Started when I converted the roomclass to an NSObject subclass. No idea 
+        // why thats the case. 
+        let x = room.addPlayer(player as String)
+        return x
     }
 }
