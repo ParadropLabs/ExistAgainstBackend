@@ -70,7 +70,7 @@ class Room: NSObject {
     
     // MARK: Player Changes
     func addPlayer(domain: String) -> [String: AnyObject] {
-        print("Adding Player")
+        print("Adding Player \(domain)")
         // Called from main session when player assigned to the room
         // Returns the information the player needs to get up to date
         
@@ -144,7 +144,7 @@ class Room: NSObject {
         startTimer(PICK_TIME, selector: "startChoosing")
     }
     
-    func pick(domain: String, card: Int) {
+    func pick(domain: NSString, card: NSNumber) {
         print("Player \(domain) picked \(card)")
         
         // Ensure state, throw exception
@@ -154,14 +154,14 @@ class Room: NSObject {
         }
         
         // get the player
-        let player = getPlayer(players, domain: domain)
+        let player = getPlayer(players, domain: String(domain))
         
         if player.pick != -1 {
             print("Player has already picked a card.")
             return
         }
         
-        player.pick = card
+        player.pick = Int(card)
         
         // TODO: ensure the player reported a legitmate pick-- remove the pick from the player's cards
         // and check the card exists in the first place
@@ -200,10 +200,22 @@ class Room: NSObject {
         startTimer(CHOOSE_TIME, selector: "startScoring:")
     }
     
-    func choose(domain: String) {
+    func choose(card: NSNumber) {
+        // find the person who played this cardr
+        let picks = players.filter { $0.pick == Int(card) }
+        
+        if picks.count == 0 {
+            print("No one played the choosen card \(card)")
+            // TODO: Choose on at random? This is malicious activity or a serious bug
+        } else if picks.count != 1 {
+            print("More than one winning pick selected!")
+        }
+        
+        let domain = picks[0].domain
         print("Winner choosen: " + domain)
+        
         cancelTimer()
-        startTimer(0.0, selector: "startScoring", info: domain)
+        startTimer(0.0, selector: "startScoring:", info: domain)
     }
     
     

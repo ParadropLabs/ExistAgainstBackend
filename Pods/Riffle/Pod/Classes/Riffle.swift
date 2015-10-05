@@ -146,7 +146,7 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
             }, cancelHandler: { () -> Void in
                 print("Register Cancelled!")
             }) { (err: NSError!) -> Void in
-                print("Registration completed: \(endpoint)")
+                //print("Registration completed: \(endpoint)")
         }
     }
     
@@ -159,7 +159,7 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
             }, cancelHandler: { () -> Void in
                 print("Register Cancelled!")
             }) { (err: NSError!) -> Void in
-                print("Registration completed: \(endpoint)")
+                //print("Registration completed: \(endpoint)")
         }
     }
     
@@ -168,7 +168,7 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
     public func call(endpoint: String, _ args: AnyObject..., handler: (([AnyObject]) -> ())?) {
         session.call(endpoint, payload: args) { (result: MDWampResult!, err: NSError!) -> Void in
             if err != nil {
-                print("ERR: ", err)
+                print("Call Error for endpoint \(endpoint): \(err)")
             }
             else {
                 if let h = handler {
@@ -182,6 +182,7 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
         session.publishTo(endpoint, args: args, kw: [:], options: [:]) { (err: NSError!) -> Void in
             if let e = err {
                 print("Error: ", e)
+                print("Publish Error for endpoint \"\(endpoint)\": \(e)")
             }
         }
     }
