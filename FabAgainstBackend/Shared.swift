@@ -67,25 +67,31 @@ class Deck {
     
     init(questionPath: String, answerPath: String) {
         //Takes the paths of the JSON source files, creates cards
-        questions = loadCards(questionPath).map { Card(json: $0) }
-        answers = loadCards(answerPath).map { Card(json: $0) }
+        
+        let load = { (name: String) -> [Card] in
+            let jsonPath = NSBundle.mainBundle().pathForResource(name, ofType: "json")
+            let x = try! NSJSONSerialization.JSONObjectWithData(NSData(contentsOfFile: jsonPath!)!, options: NSJSONReadingOptions.AllowFragments) as! [[String: AnyObject]]
+            return x.map { Card(json:$0) }
+        }
+        
+        questions = load(questionPath)
+        answers = load(answerPath)
     }
     
-    func loadCards(name: String) -> [[String: AnyObject]] {
-        let jsonPath = NSBundle.mainBundle().pathForResource(name, ofType: "json")
-        let x = try! NSJSONSerialization.JSONObjectWithData(NSData(contentsOfFile: jsonPath!)!, options: NSJSONReadingOptions.AllowFragments)
-        return x as! [[String: AnyObject]]
-    }
-    
-    func drawCards(cards: [Card], number: Int) -> [Card] {
+    func drawCards(var cards: [Card], number: Int) -> [Card] {
         // draws a number of cards for the player. Tracks duplicates (?)
         var ret: [Card] = []
         
         for _ in 0...number {
-            ret.append(randomElement(cards))
+            ret.append(randomElement(&cards, remove: true))
         }
         
         return ret
+    }
+    
+    func reshuffleCards(inout target: [Card], cards: [Card]) {
+        // "Realease" the cards formerly in play by shuffling them back into the deck 
+        target.appendContentsOf(cards)
     }
 }
 
@@ -130,9 +136,15 @@ func randomStringWithLength (len : Int) -> String {
     return String(randomString)
 }
 
-func randomElement<T>(arr: [T]) -> T {
-    // returns a random element from an array
-    return arr[Int(arc4random_uniform(UInt32(arr.count)))]
+func randomElement<T>(inout arr: [T], remove: Bool = false) -> T {
+    let i = Int(arc4random_uniform(UInt32(arr.count)))
+    let o = arr[i]
+    
+    if remove {
+        arr.removeAtIndex(i)
+    }
+    
+    return o
 }
 
 extension RangeReplaceableCollectionType where Generator.Element : Equatable {

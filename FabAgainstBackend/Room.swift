@@ -167,6 +167,13 @@ class Room: NSObject {
         // and check the card exists in the first place
         
         session.publish(name + "/play/picked", player.domain)
+        
+        // Check and see if all players have picked cards. If they have, end the round early.
+        let notPicked = players.filter { $0.pick == -1 && $0.domain != chooser!.domain}
+        if notPicked.count == 0 {
+            print("All players picked. Ending timer early. ")
+            startTimer(0.1, selector: "startChoosing")
+        }
     }
     
     
@@ -201,7 +208,7 @@ class Room: NSObject {
     }
     
     func choose(card: NSNumber) {
-        // find the person who played this cardr
+        // find the person who played this card
         let picks = players.filter { $0.pick == Int(card) }
         
         if picks.count == 0 {
@@ -214,7 +221,6 @@ class Room: NSObject {
         let domain = picks[0].domain
         print("Winner choosen: " + domain)
         
-        cancelTimer()
         startTimer(0.0, selector: "startScoring:", info: domain)
     }
     
@@ -238,11 +244,11 @@ class Room: NSObject {
             }
             
         } else {
-            let submitted = players.filter { $0.pick != -1 }
+            var submitted = players.filter { $0.pick != -1 }
             
             if submitted.count != 0 {
                 print("No player choosen. Selecting one at random from those that submitted")
-                player = randomElement(submitted)
+                player = randomElement(&submitted)
             }
         }
         
@@ -261,8 +267,15 @@ class Room: NSObject {
     
     //MARK: Utils
     func startTimer(time: NSTimeInterval, selector: String, info: AnyObject? = nil) {
+        // Run the timer for the given target with the given parameters. 
+        // Cancels the existing timer if called while one is active
+        if timer != nil {
+            timer!.invalidate()
+            timer = nil
+        }
+        
         print("Starting timer for \(time) on \(selector)")
-        timer = NSTimer.scheduledTimerWithTimeInterval(time, target: self, selector: Selector(selector), userInfo: nil, repeats: false)
+        timer = NSTimer.scheduledTimerWithTimeInterval(time, target: self, selector: Selector(selector), userInfo: info, repeats: false)
     }
     
     func cancelTimer() {

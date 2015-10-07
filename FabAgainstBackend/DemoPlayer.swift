@@ -13,7 +13,7 @@ class Dummy: Player {
     var cards: [Card] = []
     
     func randomPick() -> Card {
-        let card = randomElement(cards)
+        let card = randomElement(&cards)
         cards.removeObject(card)
         return card
     }
