@@ -75,7 +75,10 @@ class Room: NSObject {
         // Returns the information the player needs to get up to date
         
         // TODO: Assumes no duplicates, obviously
-        players.append(Player(domain: domain))
+        let player = Player()
+        player.domain = domain
+        
+        players.append(player)
         session.publish(name + "/joined", domain)
         
         
@@ -140,7 +143,7 @@ class Room: NSObject {
         question = deck.drawCards(deck.questions, number: 1)[0]
         
         chooser = players[Int(arc4random_uniform(UInt32(players.count)))]
-        session.publish(name + "/round/picking", chooser!.domain, question!.json())
+        session.publish(name + "/round/picking", chooser!.domain, question!)
         startTimer(PICK_TIME, selector: "startChoosing")
     }
     

@@ -8,23 +8,24 @@
 // This code is shared across the app and the container.
 
 import Foundation
+import Riffle
 
 // Representation of a player in the game
-class Player: Equatable {
-    var domain: String
+class Player: RiffleModel {
+    var domain = ""
     var score = 0
-    var pick: Int
+    var pick = -1
     
-    init(domain d: String) {
-        pick = -1
-        domain = d
-    }
+//    init(domain d: String) {
+//        pick = -1
+//        domain = d
+//    }
     
-    init(json: [String: AnyObject]) {
-        domain = json["domain"] as! String
-        score = json["score"] as! Int
-        pick = json["pick"] as! Int
-    }
+//    init(json: [String: AnyObject]) {
+//        domain = json["domain"] as! String
+//        score = json["score"] as! Int
+//        pick = json["pick"] as! Int
+//    }
     
     func toJson() -> [String: AnyObject] {
         return [
@@ -35,13 +36,15 @@ class Player: Equatable {
     }
 }
 
-class Card: Equatable {
-    var id: Int
-    var text: String
+class Card: RiffleModel {
+    var id = -1
+    var text = ""
     
-    init(json: [String: AnyObject]) {
-        id = json["id"] as! Int
-        text = json["text"] as! String
+    class func fromJson(json: [String: AnyObject]) -> Card {
+        let card = Card()
+        card.id = json["id"] as! Int
+        card.text = json["text"] as! String
+        return card
     }
     
     func json() -> [String: AnyObject] {
@@ -71,7 +74,7 @@ class Deck {
         let load = { (name: String) -> [Card] in
             let jsonPath = NSBundle.mainBundle().pathForResource(name, ofType: "json")
             let x = try! NSJSONSerialization.JSONObjectWithData(NSData(contentsOfFile: jsonPath!)!, options: NSJSONReadingOptions.AllowFragments) as! [[String: AnyObject]]
-            return x.map { Card(json:$0) }
+            return x.map { Card.fromJson($0) }
         }
         
         questions = load(questionPath)
