@@ -23,7 +23,6 @@
 #import "MDWampClientDelegate.h"
 #import "MDWampMessages.h"
 #import "MDWampClientConfig.h"
-#import "MDWampSerializations.h"
 
 /**
  *  Wamp - Roles
@@ -38,32 +37,6 @@ typedef NS_ENUM(NSInteger, MDWampConnectionCloseCode) {
  *  Main client class
  */
 @interface MDWamp : NSObject
-
-@property (nonatomic, assign) BOOL explicitSessionClose;
-@property (nonatomic, strong) id<MDWampTransport> transport;
-@property (nonatomic, strong) id<MDWampSerialization> serializator;
-@property (nonatomic, strong) NSString *realm;
-@property (nonatomic, assign) BOOL sessionEstablished;
-@property (nonatomic, assign) BOOL goodbyeSent;
-
-@property (nonatomic, strong) NSMutableDictionary *subscriptionRequests;
-@property (nonatomic, strong) NSMutableDictionary *subscriptionEvents;
-@property (nonatomic, strong) NSMutableDictionary *subscriptionID;
-
-@property (nonatomic, strong) NSMutableDictionary *publishRequests;
-
-@property (nonatomic, strong) NSMutableDictionary *rpcCallbackMap;
-
-@property (nonatomic, strong) NSMutableDictionary *rpcRegisterRequests;
-@property (nonatomic, strong) NSMutableDictionary *rpcUnregisterRequests;
-@property (nonatomic, strong) NSMutableDictionary *rpcRegisteredUri;
-@property (nonatomic, strong) NSMutableDictionary *rpcRegisteredProcedures;
-
-@property (nonatomic, strong) NSMutableDictionary *rpcPendingInvocation;
-
-@property (nonatomic, strong) NSTimer *hbTimer;
-@property (nonatomic, assign) int hbIncomingSeq;
-@property (nonatomic, assign) int hbOutgoingSeq;
 
 /**
  * The server generated sessionId, readonly
@@ -218,10 +191,10 @@ typedef NS_ENUM(NSInteger, MDWampConnectionCloseCode) {
  * @return NSNUmber     the requestID of the call (usable for a cancel request)
  */
 - (NSNumber *) call:(NSString*)procUri
-               args:(NSArray*)args
-             kwArgs:(NSDictionary*)argsKw
-            options:(NSDictionary*)options
-           complete:(void(^)(MDWampResult *result, NSError *error))completeBlock;
+         args:(NSArray*)args
+       kwArgs:(NSDictionary*)argsKw
+      options:(NSDictionary*)options
+     complete:(void(^)(MDWampResult *result, NSError *error))completeBlock;
 
 /**
  *  Call a remote procedure with an arbitrary payload, you can specify an array of session id to exclude or include
@@ -234,10 +207,10 @@ typedef NS_ENUM(NSInteger, MDWampConnectionCloseCode) {
  * @return NSNUmber     the requestID of the call (usable for a cancel request)
  */
 - (NSNumber *) call:(NSString*)procUri
-            payload:(id)payload
-            exclude:(NSArray*)exclude
-           eligible:(NSArray*)eligible
-           complete:(void(^)(MDWampResult *result, NSError *error))completeBlock;
+      payload:(id)payload
+      exclude:(NSArray*)exclude
+     eligible:(NSArray*)eligible
+     complete:(void(^)(MDWampResult *result, NSError *error))completeBlock;
 
 /**
  *  Call a remote procedure with an arbitrary payload
@@ -248,8 +221,8 @@ typedef NS_ENUM(NSInteger, MDWampConnectionCloseCode) {
  * @return NSNUmber     the requestID of the call (usable for a cancel request)
  */
 - (NSNumber *) call:(NSString*)procUri
-            payload:(id)payload
-           complete:(void(^)(MDWampResult *result, NSError *error))completeBlock;
+      payload:(id)payload
+     complete:(void(^)(MDWampResult *result, NSError *error))completeBlock;
 
 /**
  *  Cancel the given request call

@@ -36,8 +36,7 @@ class Session: RiffleSession {
         }
         
         // very strange exec_bad_access if you just return the element right away. 
-        // Started when I converted the roomclass to an NSObject subclass. No idea 
-        // why thats the case. 
+        // Started when I converted the roomclass to an NSObject subclass. No idea....
         let x = room.addPlayer(player as String)
         return x
     }
