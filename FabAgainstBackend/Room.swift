@@ -144,7 +144,7 @@ class Room: NSObject {
         startTimer(PICK_TIME, selector: "startChoosing")
     }
     
-    func pick(domain: NSString, card: NSNumber) {
+    func pick(domain: String, card: Int) {
         print("Player \(domain) picked \(card)")
         
         // Ensure state, throw exception
@@ -207,7 +207,7 @@ class Room: NSObject {
         startTimer(CHOOSE_TIME, selector: "startScoring:")
     }
     
-    func choose(card: NSNumber) {
+    func choose(card: Int) {
         // find the person who played this card
         let picks = players.filter { $0.pick == Int(card) }
         
