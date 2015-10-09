@@ -33,9 +33,9 @@
 
 import Foundation
 
-let PICK_TIME = 10.0
-let CHOOSE_TIME = 5.0
-let SCORE_TIME = 2.0
+let PICK_TIME = 15.0
+let CHOOSE_TIME = 8.0
+let SCORE_TIME = 3.0
 let EMPTY_TIME = 1.0
 
 // a silly little hack until I get the prefixes in place
@@ -142,8 +142,8 @@ class Room: NSObject {
         
         question = deck.drawCards(deck.questions, number: 1)[0]
         
-        chooser = players[Int(arc4random_uniform(UInt32(players.count)))]
-        session.publish(name + "/round/picking", chooser!.domain, question!)
+        chooser = nextChooser()
+        session.publish(name + "/round/picking", chooser!.domain, question!, PICK_TIME)
         startTimer(PICK_TIME, selector: "startChoosing")
     }
     
@@ -204,7 +204,7 @@ class Room: NSObject {
             }
         }
         
-        session.publish(name + "/round/choosing", ret)
+        session.publish(name + "/round/choosing", ret, CHOOSE_TIME)
         
         state = .Choosing
         startTimer(CHOOSE_TIME, selector: "startScoring:")
@@ -258,10 +258,10 @@ class Room: NSObject {
         // We have a winner or not. Publish.
         if let p = player {
             p.score += 1
-            session.publish(name + "/round/scoring", p.domain)
+            session.publish(name + "/round/scoring", p.domain, SCORE_TIME)
         } else {
             print("No players picked cards! No winers found. ")
-            session.publish(name + "/round/scoring", "")
+            session.publish(name + "/round/scoring", "", SCORE_TIME)
         }
         
         startTimer(SCORE_TIME, selector: "startPicking")
@@ -286,6 +286,16 @@ class Room: NSObject {
             t.invalidate()
             timer = nil
         }
+    }
+    
+    func nextChooser() -> Player {
+        if chooser == nil {
+            return players[0]
+        }
+        
+        let i = players.indexOf(chooser!)!
+        let y = i + 1 % (players.count - 1)
+        return players[y]
     }
 }
 
