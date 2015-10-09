@@ -14,24 +14,20 @@ import Riffle
 class Player: RiffleModel {
     var domain = ""
     var score = 0
-    var pick = -1
     
-//    init(domain d: String) {
-//        pick = -1
-//        domain = d
-//    }
-    
-//    init(json: [String: AnyObject]) {
-//        domain = json["domain"] as! String
-//        score = json["score"] as! Int
-//        pick = json["pick"] as! Int
-//    }
+    var demo = false
+    var chooser = false
+    var hand: [Card] = []
+    var pick: Card?
     
     func toJson() -> [String: AnyObject] {
+        // leftover from the old code
+        let picked = pick == nil ? -1 : pick!.id
+        
         return [
             "domain": domain,
             "score": score,
-            "pick": pick
+            "pick": picked
         ]
     }
 }

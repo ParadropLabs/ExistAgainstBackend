@@ -37,23 +37,21 @@ let PICK_TIME = 15.0
 let CHOOSE_TIME = 8.0
 let SCORE_TIME = 3.0
 let EMPTY_TIME = 1.0
+let MIN_PLAYERS = 4
 
 // a silly little hack until I get the prefixes in place
 let ID = "pd.demo.cardsagainst"
 
 
 class Room: NSObject {
-    var name = ID + "/room" + randomStringWithLength(6)
-    var deck: Deck
-    var state: State = .Empty
-    
-    var demoPlayer: Player?
-    var players: [Player] = []
-    var chooser: Player?
     var session: Session
+    var name = ID + "/room" + randomStringWithLength(6)
+    
+    var state: State = .Empty
+    var deck: Deck
+    var players: [Player] = []
     
     var timer: NSTimer?
-    var question: Card?
     
     
     init(session s: Session, deck d: Deck) {
@@ -81,16 +79,11 @@ class Room: NSObject {
         players.append(player)
         session.publish(name + "/joined", domain)
         
+        // Check and see if we need to add players to the room
+        checkDemo()
         
-        // If there are not enough players to begin play, inject a demo player
-        // DEFER
+        // Begin the round after we handshake with the player
         defer {
-//            if players.count == 1 {
-//                let ret = addPlayer("pd.demo.cardsagainst.demo")
-//                startPicking()
-//            }
-            
-            // Wait a second to start picking
             if players.count > 1 {
                 startTimer(EMPTY_TIME, selector: "startPicking")
             } else {
@@ -106,9 +99,20 @@ class Room: NSObject {
             "room" : name
         ]
     }
-    
-    func checkDemo() {
 
+    func checkDemo() {
+        // if there are not enough players to play, add demo players until there are at least MIN_PLAYERS in the room
+        // This method cannot be called wily-nily, be careful.
+        while players.count < MIN_PLAYERS {
+            let demo = Player()
+            demo.demo = true
+            demo.domain = "Bot--" + randomStringWithLength(3)
+            hands[demo] = deck.drawCards(deck.answers, number: HAND_SIZE)
+            players.append(demo)
+            session.publish(name + "/joined", demo.domain)
+        }
+        
+        // TODO: If there are more than enough players to play, remove extra demo players
     }
     
     func playerLeft(domain: String) {
@@ -117,13 +121,12 @@ class Room: NSObject {
 
         session.publish(name + "/left", domain)
         
-        // Make sure we have enough players to play
-        if players.count < 2 {
-            // This round is over, inform the players
-            // TODO
-            cancelTimer()
-            session.publish(name + "/play/cancel")
-        }
+        // if there are not enough players remaining add a demo 
+        // Can we do this here? Arbitrarily?
+        checkDemo()
+        
+        // TODO: What if the chooser leaves?
+        // TODO: if there are only demo players left in the room, close the room
     }
     
     
@@ -132,15 +135,13 @@ class Room: NSObject {
         print("STATE: Picking")
         state = .Picking
         
-        // TODO: clean up demo players sticking around that we no longer need
-        
         // TODO: the chooser from the last round should not get a card (no burn)
         players.map { $0.pick = -1 }
         
-        question = deck.drawCards(deck.questions, number: 1)[0]
+        let question = deck.drawCards(deck.questions, number: 1)[0]
         
         chooser = nextChooser()
-        session.publish(name + "/round/picking", chooser!.domain, question!, PICK_TIME)
+        session.publish(name + "/round/picking", chooser!.domain, question, PICK_TIME)
         startTimer(PICK_TIME, selector: "startChoosing")
     }
     
@@ -288,12 +289,10 @@ class Room: NSObject {
         }
     }
     
-    func nextChooser() -> Player {
-        if chooser == nil {
-            return players[0]
-        }
-        
-        return players[players.indexOf(chooser!)! + 1 % (players.count - 1)]
+    func setNextChooser() -> Player {
+        let f = players.filter { $0.chooser == true }
+        let player = f.count == 0 ? players[0] : players[players.indexOf(f[0])! + 1 % (players.count - 1)]
+        return player
     }
 }
 
