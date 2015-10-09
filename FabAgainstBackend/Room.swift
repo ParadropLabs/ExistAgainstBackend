@@ -135,10 +135,7 @@ class Room: NSObject {
         // TODO: clean up demo players sticking around that we no longer need
         
         // TODO: the chooser from the last round should not get a card (no burn)
-        for player in players  {
-            player.pick = -1
-            session.call(player.domain + "/draw", deck.drawCards(deck.answers, number: 1)[0].json(), handler:nil)
-        }
+        players.map { $0.pick = -1 }
         
         question = deck.drawCards(deck.questions, number: 1)[0]
         
@@ -263,6 +260,9 @@ class Room: NSObject {
             print("No players picked cards! No winers found. ")
             session.publish(name + "/round/scoring", "", SCORE_TIME)
         }
+
+        // draw cards for all players
+        players.map { session.call($0.domain + "/draw", deck.drawCards(deck.answers, number: 1)[0].json(), handler:nil) }
         
         startTimer(SCORE_TIME, selector: "startPicking")
     }
