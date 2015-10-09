@@ -293,9 +293,7 @@ class Room: NSObject {
             return players[0]
         }
         
-        let i = players.indexOf(chooser!)!
-        let y = i + 1 % (players.count - 1)
-        return players[y]
+        return players[players.indexOf(chooser!)! + 1 % (players.count - 1)]
     }
 }
 
