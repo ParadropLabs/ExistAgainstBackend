@@ -107,7 +107,7 @@ class Room: NSObject {
             let demo = Player()
             demo.demo = true
             demo.domain = "Bot--" + randomStringWithLength(3)
-            hands[demo] = deck.drawCards(deck.answers, number: HAND_SIZE)
+            demo.hand = deck.drawCards(deck.answers, number: HAND_SIZE)
             players.append(demo)
             session.publish(name + "/joined", demo.domain)
         }
@@ -136,17 +136,17 @@ class Room: NSObject {
         state = .Picking
         
         // TODO: the chooser from the last round should not get a card (no burn)
-        players.map { $0.pick = -1 }
+        players.map { $0.pick = nil }
         
         let question = deck.drawCards(deck.questions, number: 1)[0]
         
-        chooser = nextChooser()
-        session.publish(name + "/round/picking", chooser!.domain, question, PICK_TIME)
+        let chooser = setNextChooser()
+        session.publish(name + "/round/picking", chooser.domain, question, PICK_TIME)
         startTimer(PICK_TIME, selector: "startChoosing")
     }
     
-    func pick(domain: String, card: Int) {
-        print("Player \(domain) picked \(card)")
+    func pick(player: Player, card: Card) {
+        print("Player \(player) picked \(card)")
         
         // Ensure state, throw exception
         if state != .Picking {
@@ -154,15 +154,12 @@ class Room: NSObject {
             return
         }
         
-        // get the player
-        let player = getPlayer(players, domain: String(domain))
-        
-        if player.pick != -1 {
+        if player.pick != nil {
             print("Player has already picked a card.")
             return
         }
         
-        player.pick = Int(card)
+        player.pick = card
         
         // TODO: ensure the player reported a legitmate pick-- remove the pick from the player's cards
         // and check the card exists in the first place
@@ -170,7 +167,8 @@ class Room: NSObject {
         session.publish(name + "/play/picked", player.domain)
         
         // Check and see if all players have picked cards. If they have, end the round early.
-        let notPicked = players.filter { $0.pick == -1 && $0.domain != chooser!.domain}
+        let notPicked = players.filter { $0.pick == nil && $0.domain != getChooser()!.domain}
+        
         if notPicked.count == 0 {
             print("All players picked. Ending timer early. ")
             startTimer(0.1, selector: "startChoosing")
@@ -182,9 +180,9 @@ class Room: NSObject {
     func startChoosing() {
         print("STATE: choosing")
         
-        // Autoassign picks for the user if they had not yet submitted
+        // Autoassign picks for the user if they habd not yet submitted
         // TODO: inform them off the autopick
-        //for p in players {
+        // for p in players {
         //    if p.pick == -1 {
         //        p.pick = randomElement(deck.answers).id
         //    }
@@ -292,7 +290,18 @@ class Room: NSObject {
     func setNextChooser() -> Player {
         let f = players.filter { $0.chooser == true }
         let player = f.count == 0 ? players[0] : players[players.indexOf(f[0])! + 1 % (players.count - 1)]
+        player.chooser = true
         return player
+    }
+    
+    func getChooser() -> Player? {
+        let f = players.filter { $0.chooser == true }
+        if f.count != 1 {
+            print("No chooser found!")
+            return nil
+        }
+        
+        return f[0]
     }
 }
 
