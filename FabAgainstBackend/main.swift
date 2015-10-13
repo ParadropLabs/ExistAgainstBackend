@@ -13,3 +13,5 @@ setFabric("ws://ubuntu@ec2-52-26-83-61.us-west-2.compute.amazonaws.com:8000/ws")
 Session(domain: "pd.demo.cardsagainst").connect()
 NSRunLoop.currentRunLoop().run()
 
+
+defaults write com.apple.dt.xcode DVTSDKLogLevel -int 3 && killall -u $USER cfprefsd
