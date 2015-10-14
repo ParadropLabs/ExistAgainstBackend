@@ -158,6 +158,10 @@ class Room: NSObject {
             return
         }
         
+        if !player.hand.contains(card) {
+            
+        }
+        
         player.pick = card
         
         // TODO: ensure the player reported a legitmate pick-- remove the pick from the player's cards
