@@ -102,7 +102,6 @@ class Room: NSObject {
 
     func checkDemo() {
         // if there are not enough players to play, add demo players until there are at least MIN_PLAYERS in the room
-        // This method cannot be called wily-nily, be careful.
         while players.count < MIN_PLAYERS {
             let demo = Player()
             demo.demo = true
@@ -113,19 +112,19 @@ class Room: NSObject {
         }
         
         // TODO: If there are more than enough players to play, remove extra demo players
+        // Be careful: can't do this in the middle of a round
     }
     
-    func playerLeft(domain: String) {
-        print("Player left: " + domain)
-        // Check who the user is! If the chooser left we have to cancel or replace it with a demo user
+    func playerLeft(player: Player) {
+        print("Player left: " + player.domain)
 
-        session.publish(name + "/left", domain)
+        session.publish(name + "/left", player)
         
         // if there are not enough players remaining add a demo 
         // Can we do this here? Arbitrarily?
         checkDemo()
         
-        // TODO: What if the chooser leaves?
+        // TODO: What if the chooser leaves? Replace with a demo user?
         // TODO: if there are only demo players left in the room, close the room
     }
     
@@ -141,7 +140,7 @@ class Room: NSObject {
         let question = deck.drawCards(deck.questions, number: 1)[0]
         
         let chooser = setNextChooser()
-        session.publish(name + "/round/picking", chooser.domain, question, PICK_TIME)
+        session.publish(name + "/round/picking", chooser, question, PICK_TIME)
         startTimer(PICK_TIME, selector: "startChoosing")
     }
     
