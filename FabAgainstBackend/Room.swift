@@ -28,7 +28,6 @@
     Registers:
     /room/current
     /room/play/pick
-
 */
 
 import Foundation
@@ -136,12 +135,12 @@ class Room: NSObject {
         state = .Picking
         
         // TODO: the chooser from the last round should not get a card (no burn)
+        
         players.map { $0.pick = nil }
-        
         let question = deck.drawCards(deck.questions, number: 1)[0]
-        
         let chooser = setNextChooser()
-        session.publish(name + "/round/picking", chooser.domain, question, PICK_TIME)
+        
+        session.publish(name + "/round/picking", chooser, question, PICK_TIME)
         startTimer(PICK_TIME, selector: "startChoosing")
     }
     
@@ -191,6 +190,7 @@ class Room: NSObject {
         // publish the picks-- with mantle changes this should turn into direct object transference
         
         // get the cards from the ids of the picks
+
         var ret : [AnyObject] = []
         for p in players {
             let cards = deck.answers.filter {$0.id == p.pick }
