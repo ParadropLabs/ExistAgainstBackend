@@ -135,7 +135,7 @@ class Room: NSObject {
         state = .Picking
         
         // TODO: the chooser from the last round should not get a card (no burn)
-        players.map { $0.pick = nil }
+        _ = players.map { $0.pick = nil }
         
         let question = deck.drawCards(deck.questions, number: 1)[0]
         
@@ -159,15 +159,14 @@ class Room: NSObject {
         }
         
         if !player.hand.contains(card) {
-            
+            print("Player picked a card they dont have!")
+            return
         }
         
         player.pick = card
+        player.hand.removeObject(card)
         
-        // TODO: ensure the player reported a legitmate pick-- remove the pick from the player's cards
-        // and check the card exists in the first place
-        
-        session.publish(name + "/play/picked", player.domain)
+        session.publish(name + "/play/picked", player)
         
         // Check and see if all players have picked cards. If they have, end the round early.
         let notPicked = players.filter { $0.pick == nil && $0.domain != getChooser()!.domain}
@@ -194,6 +193,8 @@ class Room: NSObject {
         // publish the picks-- with mantle changes this should turn into direct object transference
         
         // get the cards from the ids of the picks
+        var cards = players.map { $0.pick }
+        cards = cards.filter { $0 != nil }
         var ret : [AnyObject] = []
         for p in players {
             let cards = deck.answers.filter {$0.id == p.pick }
