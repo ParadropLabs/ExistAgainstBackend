@@ -192,8 +192,8 @@ class Room: NSObject {
         // publish the picks-- with mantle changes this should turn into direct object transference
         
         // get the cards from the ids of the picks
-        var cards = players.map { $0.pick }
-        cards = cards.filter { $0 != nil }
+        let cards = players.map { $0.pick }
+        let ret: [Card] = cards.filter { $0 != nil } as! [Card]
         
 //        var ret : [AnyObject] = []
 //        for p in players {
@@ -204,15 +204,15 @@ class Room: NSObject {
 //            }
 //        }
         
-        session.publish(name + "/round/choosing", cards, CHOOSE_TIME)
+        session.publish(name + "/round/choosing", ret, CHOOSE_TIME)
         
         state = .Choosing
         startTimer(CHOOSE_TIME, selector: "startScoring:")
     }
     
-    func choose(card: Int) {
+    func choose(card: Card) {
         // find the person who played this card
-        let picks = players.filter { $0.pick == Int(card) }
+        let picks = players.filter { $0.pick == card }
         
         if picks.count == 0 {
             print("No one played the choosen card \(card)")
@@ -221,10 +221,9 @@ class Room: NSObject {
             print("More than one winning pick selected!")
         }
         
-        let domain = picks[0].domain
-        print("Winner choosen: " + domain)
+        print("Winner choosen: " + picks[0].domain)
         
-        startTimer(0.0, selector: "startScoring:", info: domain)
+        startTimer(0.0, selector: "startScoring:", info: picks[0].domain)
     }
     
     
@@ -265,7 +264,7 @@ class Room: NSObject {
         }
 
         // draw cards for all players
-        players.map { session.call($0.domain + "/draw", deck.drawCards(deck.answers, number: 1)[0].json(), handler:nil) }
+        players.map { session.call($0.domain + "/draw", deck.drawCards(deck.answers, number: 1)[0], handler:nil) }
         
         startTimer(SCORE_TIME, selector: "startPicking")
     }
