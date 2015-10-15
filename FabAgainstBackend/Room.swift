@@ -101,7 +101,6 @@ class Room: NSObject {
 
     func checkDemo() {
         // if there are not enough players to play, add demo players until there are at least MIN_PLAYERS in the room
-        // This method cannot be called wily-nily, be careful.
         while players.count < MIN_PLAYERS {
             let demo = Player()
             demo.demo = true
@@ -112,19 +111,19 @@ class Room: NSObject {
         }
         
         // TODO: If there are more than enough players to play, remove extra demo players
+        // Be careful: can't do this in the middle of a round
     }
     
-    func playerLeft(domain: String) {
-        print("Player left: " + domain)
-        // Check who the user is! If the chooser left we have to cancel or replace it with a demo user
+    func playerLeft(player: Player) {
+        print("Player left: " + player.domain)
 
-        session.publish(name + "/left", domain)
+        session.publish(name + "/left", player)
         
         // if there are not enough players remaining add a demo 
         // Can we do this here? Arbitrarily?
         checkDemo()
         
-        // TODO: What if the chooser leaves?
+        // TODO: What if the chooser leaves? Replace with a demo user?
         // TODO: if there are only demo players left in the room, close the room
     }
     
@@ -135,11 +134,11 @@ class Room: NSObject {
         state = .Picking
         
         // TODO: the chooser from the last round should not get a card (no burn)
+        _ = players.map { $0.pick = nil }
         
-        players.map { $0.pick = nil }
         let question = deck.drawCards(deck.questions, number: 1)[0]
         let chooser = setNextChooser()
-        
+
         session.publish(name + "/round/picking", chooser, question, PICK_TIME)
         startTimer(PICK_TIME, selector: "startChoosing")
     }
@@ -158,12 +157,15 @@ class Room: NSObject {
             return
         }
         
+        if !player.hand.contains(card) {
+            print("Player picked a card they dont have!")
+            return
+        }
+        
         player.pick = card
+        player.hand.removeObject(card)
         
-        // TODO: ensure the player reported a legitmate pick-- remove the pick from the player's cards
-        // and check the card exists in the first place
-        
-        session.publish(name + "/play/picked", player.domain)
+        session.publish(name + "/play/picked", player)
         
         // Check and see if all players have picked cards. If they have, end the round early.
         let notPicked = players.filter { $0.pick == nil && $0.domain != getChooser()!.domain}
@@ -190,17 +192,19 @@ class Room: NSObject {
         // publish the picks-- with mantle changes this should turn into direct object transference
         
         // get the cards from the ids of the picks
-
-        var ret : [AnyObject] = []
-        for p in players {
-            let cards = deck.answers.filter {$0.id == p.pick }
-            
-            if cards.count == 1 {
-                ret.append(cards[0].json())
-            }
-        }
+        var cards = players.map { $0.pick }
+        cards = cards.filter { $0 != nil }
         
-        session.publish(name + "/round/choosing", ret, CHOOSE_TIME)
+//        var ret : [AnyObject] = []
+//        for p in players {
+//            let cards = deck.answers.filter {$0.id == p.pick }
+//            
+//            if cards.count == 1 {
+//                ret.append(cards[0].json())
+//            }
+//        }
+        
+        session.publish(name + "/round/choosing", cards, CHOOSE_TIME)
         
         state = .Choosing
         startTimer(CHOOSE_TIME, selector: "startScoring:")
