@@ -12,6 +12,8 @@ import Riffle
 
 // Representation of a player in the game
 class Player: RiffleModel {
+    var id = Int(arc4random_uniform(UInt32.max))
+    
     var domain = ""
     var score = 0
     

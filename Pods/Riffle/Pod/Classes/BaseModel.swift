@@ -11,7 +11,7 @@ import Mantle
 
 
 public class RiffleModel : MTLModel, MTLJSONSerializing {
-    var id = Int(arc4random_uniform(UInt32.max))
+//    var id = Int(arc4random_uniform(UInt32.max))
     
 //    override public func isEqual(object: AnyObject?) -> Bool {
 //        if object_getClassName(self) != object_getClassName(object) {
