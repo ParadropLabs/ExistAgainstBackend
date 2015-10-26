@@ -105,7 +105,11 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
         session.registerRPC(endpoint, procedure: { (wamp: MDWamp!, invocation: MDWampInvocation!) -> Void in
             
             let result = fn(invocation.arguments)
-            wamp.resultForInvocation(invocation, arguments: [result as! AnyObject], argumentsKw: [:])
+            if let autoArray = result as? [AnyObject] {
+                wamp.resultForInvocation(invocation, arguments: autoArray, argumentsKw: [:])
+            } else {
+                wamp.resultForInvocation(invocation, arguments: [result as! AnyObject], argumentsKw: [:])
+            }
             
             }, cancelHandler: { () -> Void in
                 print("Register Cancelled!")
