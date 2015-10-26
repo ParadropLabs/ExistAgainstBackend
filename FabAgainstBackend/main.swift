@@ -19,7 +19,8 @@ class Session: RiffleSession {
     var pg21 = Deck(questionPath: "q21", answerPath: "a21")
     
     override func onJoin() {
-        register("pd.demo.cardsagainst/play", getRoom)
+        print("Session joined")
+        register("xs.demo.cardsagainst/play", getRoom)
     }
     
     func getRoom(player: NSString) -> AnyObject {
@@ -43,5 +44,5 @@ class Session: RiffleSession {
 }
 
 setFabric("ws://ubuntu@ec2-52-26-83-61.us-west-2.compute.amazonaws.com:8000/ws")
-Session(domain: "pd.demo.cardsagainst").connect()
+Session(domain: "xs.demo.cardsagainst").connect()
 NSRunLoop.currentRunLoop().run()
