@@ -68,8 +68,6 @@ public func convert <A, T>(a:A, _ t:T.Type) -> T? {
     default: break
     }
     
-    //    print(T.self)
-    
     // Attempt a model conversion
     if let Klass = t as? RiffleModel.Type {
         return (MTLJSONAdapter.modelOfClass(Klass, fromJSONDictionary: a as! [NSObject:AnyObject]) as! T)
@@ -78,10 +76,19 @@ public func convert <A, T>(a:A, _ t:T.Type) -> T? {
     // TODO: Boolean, dicts,
     
     // Collections, applied recursively
+    // Going to have to apply the osx bug fix here too... string checking required
     if let source = a as? NSArray {
         switch t {
         case is [String].Type:
             return (source.map { convert($0, String.self)! } as! T)
+        case is [Bool].Type:
+            return (source.map { convert($0, Bool.self)! } as! T)
+        case is [Int].Type:
+            return (source.map { convert($0, Int.self)! } as! T)
+        case is [Float].Type:
+            return (source.map { convert($0, Float.self)! } as! T)
+        case is [RiffleModel].Type:
+            return (source.map { convert($0, RiffleModel.self)! } as! T)
         default:
             print("TODO: The rest of these are not implemented!")
         }
@@ -114,7 +121,7 @@ precedence 155
 
 func <- <T> (t:T.Type, object: AnyObject) -> T {
     let a = convert(object, t)
-    //    print(a)
+    print(a)
     return a!
 }
 

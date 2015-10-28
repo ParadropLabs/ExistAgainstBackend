@@ -66,7 +66,7 @@ class Room: NSObject {
     
     
     // MARK: Player Changes
-    func addPlayer(domain: String) -> [String: AnyObject] {
+    func addPlayer(domain: String) -> [AnyObject] {
         print("Adding Player \(domain)")
         // Called from main session when player assigned to the room
         // Returns the information the player needs to get up to date
@@ -94,10 +94,10 @@ class Room: NSObject {
         
         // Return the player's hand, the current players, and the current state
         return [
-            "players": players.map { $0.toJson() },
-            "state" : String(state),
-            "hand" : deck.drawCards(deck.answers, number: HAND_SIZE).map { $0.json() },
-            "room" : name
+            players.map { $0.toJson() },
+            String(state),
+            deck.drawCards(deck.answers, number: HAND_SIZE).map { $0.json() },
+            name
         ]
     }
 
