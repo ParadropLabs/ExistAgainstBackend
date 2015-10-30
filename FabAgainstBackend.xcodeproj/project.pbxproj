@@ -19,7 +19,7 @@
 		50F380461BBDB7010028628B /* q13.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 50F380351BBDA5C30028628B /* q13.json */; };
 		50F380471BBDB7010028628B /* q21.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 50F380361BBDA5C30028628B /* q21.json */; };
 		50F380491BBDEF650028628B /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F380481BBDEF650028628B /* Shared.swift */; settings = {ASSET_TAGS = (); }; };
-		66BDF08C08D9C1F7EEFBBCC5 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6907D5F41DC0C7EB5E17803 /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		66BDF08C08D9C1F7EEFBBCC5 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6907D5F41DC0C7EB5E17803 /* Pods.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */

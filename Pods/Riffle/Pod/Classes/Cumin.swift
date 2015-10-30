@@ -14,85 +14,71 @@ TODO:
 throw a well known error on miscast
 throw a well known error if args size doesn't match
 hold method weakly, dont call if deallocd EDIT: actually, dont hold the method at all-- evaluate at execution time
-
-NOTES:
-Stupid generics.
-Could be useful http://stackoverflow.com/questions/27591366/swift-generic-type-cast
-
-Works to detect an array, but from there...
-if t is ArrayProtocol.Type {
 */
 
 import Foundation
 import Mantle
 
-// Hack to get the arrays to detect
-protocol ArrayProtocol{}
-extension Array: ArrayProtocol {}
-
-
-// MARK: Converters
-public func convert <A, T>(a:A, _ t:T.Type) -> T? {
-    // Attempts to convert the given argument to the expected type
-    
-    // If the type casts out the box it is most likely the intended type
-    if let z = a as? T {
-        return z
-    }
-    
-    // Begin the OSX bug
-    if "\(T.self)" == "Int" {
-        return unsafeBitCast(Int(a as! NSNumber), T.self)
-    }
-    
-    if "\(T.self)" == "String" {
-        return unsafeBitCast(String(a as! NSString), T.self)
-    }
-    
-    // Primitive conversion
-    // TODO: check to make sure the passed type is valid: a.dynamicType == NSNumber.self
-    
-    switch t {
-    case is Int:
-        return Int(a as! NSNumber) as? T
+func convert<A: AnyObject, T: Cuminicable>(a: A?, _ t: T.Type) -> T? {
+    if let x = a {
+        let ret = t.convert(x)
         
-    case is Double.Type:
-        return Double(a as! NSNumber) as? T
+        // If nothing was returned then no possible conversion was possible
+        guard let castResult = ret else { return nil }
         
-    case is Float.Type:
-        return Float(a as! NSNumber) as? T
+        if let finalResult = castResult as? T {
+            return finalResult
+        }
         
-    case is String.Type:
-        return String(a) as? T
-        
-    default: break
-    }
-    
-    // Attempt a model conversion
-    if let Klass = t as? RiffleModel.Type {
-        return (MTLJSONAdapter.modelOfClass(Klass, fromJSONDictionary: a as! [NSObject:AnyObject]) as! T)
-    }
-    
-    // TODO: Boolean, dicts,
-    
-    // Collections, applied recursively
-    // Going to have to apply the osx bug fix here too... string checking required
-    if let source = a as? NSArray {
-        switch t {
-        case is [String].Type:
-            return (source.map { convert($0, String.self)! } as! T)
-        case is [Bool].Type:
-            return (source.map { convert($0, Bool.self)! } as! T)
-        case is [Int].Type:
-            return (source.map { convert($0, Int.self)! } as! T)
-        case is [Float].Type:
-            return (source.map { convert($0, Float.self)! } as! T)
-        case is [RiffleModel].Type:
-            return (source.map { convert($0, RiffleModel.self)! } as! T)
-        default:
-            print("TODO: The rest of these are not implemented!")
+        // Catch the OSX error as a last resort: on OSX the type pointers point to different things because of
+        // "embedded swift code..." and the library being imported twice
+        // If we've gotten here the normal things aren't going to work
+        if let bibble = t.brutalize(castResult, T.self) as? T{
+            return bibble
         }
     }
+    
+    return nil
+}
+
+func convert<A: AnyObject, T: CollectionType where T.Generator.Element: Cuminicable>(a: A?, _ t: T.Type) -> T? {
+    // Attempt to convert an array of arbitrary elements to collection of Cuminicable elements. The sequence is passed
+    // as a type of these elements as understood from the method signature where they're declared.
+    
+    // The expected sequence element type
+    // Not implemented: recursive handling of nested data structures-- this is very important!
+    
+    // Attempt to process the incoming parameters as an array
+    if let x = a as? NSArray {
+        var ret: [T.Generator.Element] = []
+        
+        for e in x {
+            // Check for failure?
+            let converted = T.Generator.Element.self <- e
+            ret.append(converted)
+            
+            /*
+            if let converted = CuminicableElement.convert(e) as? T.Generator.Element {
+            ret.append(converted)
+            } else {
+            // If a single one of the casts fail, stop processing the collection.
+            // This behavior may not always be expected since it does not allow collections of optionals
+            
+            // TODO: Print out or return some flavor of log here?
+            return nil
+            }
+            */
+        }
+        
+        if let cast = ret as? T {
+            return cast
+        }
+        
+        // Emergency time-- have to cover the OSX cases here
+        return unsafeBitCast(ret, T.self)
+    }
+    
+    // Cover dicts and nesting here!
     
     return nil
 }
@@ -119,107 +105,117 @@ associativity right
 precedence 155
 }
 
-func <- <T> (t:T.Type, object: AnyObject) -> T {
+func <- <T: CN> (t:T.Type, object: AnyObject) -> T {
     let a = convert(object, t)
-    print(a)
+    //    print(a)
     return a!
 }
 
-
-//MARK: Cumin Overloads
-public func cumin(fn: () -> ()) -> ([AnyObject]) -> () {
-    return { (a: [AnyObject]) in fn() }
+func <- <T: CollectionType where T.Generator.Element: CN> (t:T.Type, object: AnyObject) -> T {
+    let a = convert(object, t)
+    return a!
 }
 
-public func cumin<A>(fn: (A) -> ()) -> ([AnyObject]) -> () {
-    return { (a: [AnyObject]) in fn(A.self <- a[0]) }
+// MARK: Deprecated V1 Cumin
+/*
+public func convert <A, T>(a:A, _ t:T.Type) -> T? {
+// Attempts to convert the given argument to the expected type
+
+// If the type casts out the box it is most likely the intended type
+if let z = a as? T {
+return z
 }
 
-public func cumin<A, B>(fn: (A, B) -> ()) -> ([AnyObject]) -> () {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1]) }
+// Begin the OSX bug
+if "\(T.self)" == "Int" {
+return unsafeBitCast(Int(a as! NSNumber), T.self)
 }
 
-public func cumin<A, B, C>(fn: (A, B, C) -> ()) -> ([AnyObject]) -> () {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1], C.self <- a[2]) }
+if "\(T.self)" == "String" {
+return unsafeBitCast(String(a as! NSString), T.self)
 }
 
-public func cumin<A, B, C, D>(fn: (A, B, C, D) -> ()) -> ([AnyObject]) -> () {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1], C.self <- a[2], D.self <- a[3]) }
+// Primitive conversion
+// TODO: check to make sure the passed type is valid: a.dynamicType == NSNumber.self
+
+switch t {
+case is Int:
+return Int(a as! NSNumber) as? T
+
+case is Double.Type:
+return Double(a as! NSNumber) as? T
+
+case is Float.Type:
+return Float(a as! NSNumber) as? T
+
+case is String.Type:
+return String(a) as? T
+
+default: break
 }
 
-public func cumin<A, B, C, D, E>(fn: (A, B, C, D, E) -> ()) -> ([AnyObject]) -> () {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1], C.self <- a[2], D.self <- a[3], E.self <- a[4]) }
+// Attempt a model conversion
+if let Klass = t as? RiffleModel.Type {
+return (MTLJSONAdapter.modelOfClass(Klass, fromJSONDictionary: a as! [NSObject:AnyObject]) as! T)
 }
 
-public func cumin<R>(fn: () -> (R)) -> ([AnyObject]) -> (R) {
-    return { (a: [AnyObject]) in fn() }
+// TODO: Boolean, dicts,
+
+// Collections, applied recursively
+// Going to have to apply the osx bug fix here too... string checking required
+if let source = a as? NSArray {
+
+// If we're reciving an array and its empty, it doesn't matter what you expected to get back (right?)
+// Alternatively, this could just be an error, in which case you're screwed
+if source.count == 0 {
+return [] as! T
 }
 
-public func cumin<A, R>(fn: (A) -> (R)) -> ([AnyObject]) -> (R) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0]) }
+let element = source.firstObject!
+print(element)
+
+if let r = element as? RiffleModel.Type {
+print("ISARIFFLEMODEL")
 }
 
-public func cumin<A, B, R>(fn: (A, B) -> (R)) -> ([AnyObject]) -> (R) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1]) }
+switch t {
+case is [String].Type:
+return (source.map { convert($0, String.self)! } as! T)
+case is [Bool].Type:
+return (source.map { convert($0, Bool.self)! } as! T)
+case is [Int].Type:
+return (source.map { convert($0, Int.self)! } as! T)
+case is [Float].Type:
+return (source.map { convert($0, Float.self)! } as! T)
+case is [RiffleModel].Type:
+return (source.map { convert($0, RiffleModel.self)! } as! T)
+default:
+print("UNIMPLEMENTED COLLECTION: \(source.dynamicType)")
+//            print(source)
+print(t)
+
+if let Klass = t as? [RiffleModel].Type {
+print("Able to extrace the programmic types: Klass")
+}
+}
 }
 
-public func cumin<A, B, C, R>(fn: (A, B, C) -> (R)) -> ([AnyObject]) -> (R) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1], C.self <- a[2]) }
+return nil
 }
 
-public func cumin<A, B, C, D, R>(fn: (A, B, C, D) -> (R)) -> ([AnyObject]) -> (R) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1], C.self <- a[2], D.self <- a[3]) }
+
+public func serialize(args: [AnyObject]) -> [AnyObject] {
+// Converts types for serialization, mostly RiffleModels
+var ret: [AnyObject] = []
+
+for a in args {
+if let object = a as? RiffleModel {
+ret.append(MTLJSONAdapter.JSONDictionaryFromModel(object))
+} else {
+ret.append(a)
+}
 }
 
-public func cumin<A, B, C, D, E, R>(fn: (A, B, C, D, E) -> (R)) -> ([AnyObject]) -> (R) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1], C.self <- a[2], D.self <- a[3], E.self <- a[4]) }
+return ret
 }
-
-public func cumin<R, S>(fn: () -> (R, S)) -> ([AnyObject]) -> (R, S) {
-    return { (a: [AnyObject]) in fn() }
-}
-
-public func cumin<A, R, S>(fn: (A) -> (R, S)) -> ([AnyObject]) -> (R, S) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0]) }
-}
-
-public func cumin<A, B, R, S>(fn: (A, B) -> (R, S)) -> ([AnyObject]) -> (R, S) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1]) }
-}
-
-public func cumin<A, B, C, R, S>(fn: (A, B, C) -> (R, S)) -> ([AnyObject]) -> (R, S) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1], C.self <- a[2]) }
-}
-
-public func cumin<A, B, C, D, R, S>(fn: (A, B, C, D) -> (R, S)) -> ([AnyObject]) -> (R, S) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1], C.self <- a[2], D.self <- a[3]) }
-}
-
-public func cumin<A, B, C, D, E, R, S>(fn: (A, B, C, D, E) -> (R, S)) -> ([AnyObject]) -> (R, S) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1], C.self <- a[2], D.self <- a[3], E.self <- a[4]) }
-}
-
-public func cumin<R, S, T>(fn: () -> (R, S, T)) -> ([AnyObject]) -> (R, S, T) {
-    return { (a: [AnyObject]) in fn() }
-}
-
-public func cumin<A, R, S, T>(fn: (A) -> (R, S, T)) -> ([AnyObject]) -> (R, S, T) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0]) }
-}
-
-public func cumin<A, B, R, S, T>(fn: (A, B) -> (R, S, T)) -> ([AnyObject]) -> (R, S, T) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1]) }
-}
-
-public func cumin<A, B, C, R, S, T>(fn: (A, B, C) -> (R, S, T)) -> ([AnyObject]) -> (R, S, T) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1], C.self <- a[2]) }
-}
-
-public func cumin<A, B, C, D, R, S, T>(fn: (A, B, C, D) -> (R, S, T)) -> ([AnyObject]) -> (R, S, T) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1], C.self <- a[2], D.self <- a[3]) }
-}
-
-public func cumin<A, B, C, D, E, R, S, T>(fn: (A, B, C, D, E) -> (R, S, T)) -> ([AnyObject]) -> (R, S, T) {
-    return { (a: [AnyObject]) in fn(A.self <- a[0], B.self <- a[1], C.self <- a[2], D.self <- a[3], E.self <- a[4]) }
-}
-
+*/
