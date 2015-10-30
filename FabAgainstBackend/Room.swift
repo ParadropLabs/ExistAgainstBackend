@@ -79,7 +79,7 @@ class Room: NSObject {
         session.publish(name + "/joined", domain)
         
         // Check and see if we need to add players to the room
-        checkDemo()
+        // checkDemo()
         
         // Begin the round after we handshake with the player
         defer {
@@ -90,15 +90,7 @@ class Room: NSObject {
             }
         }
         
-        print("Adding player \(player)")
-        
-        // Return the player's hand, the current players, and the current state
-        return [
-            players.map { $0.toJson() },
-            String(state),
-            deck.drawCards(deck.answers, number: HAND_SIZE).map { $0.json() },
-            name
-        ]
+        return [players, String(state), deck.drawCards(deck.answers, number: HAND_SIZE), name]
     }
 
     func checkDemo() {

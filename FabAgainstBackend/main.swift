@@ -24,8 +24,6 @@ class Session: RiffleSession {
     }
     
     func getRoom(player: String) -> AnyObject {
-        // Assign the player to a room. Returns cards for the player
-        
         let emptyRooms = rooms.filter { $0.players.count <= ROOM_CAP }
         var room: Room
         
@@ -36,8 +34,6 @@ class Session: RiffleSession {
             room = emptyRooms[Int(arc4random_uniform(UInt32(emptyRooms.count)))]
         }
         
-        // very strange exec_bad_access if you just return the element right away.
-        // Started when I converted the roomclass to an NSObject subclass. No idea....
         let x = room.addPlayer(player as String)
         return x
     }
