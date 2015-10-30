@@ -13,7 +13,7 @@ class Room: NSObject {
     var session: Session
     var name = ID + "/room" + randomStringWithLength(6)
     
-    var state: State = .Empty
+    var state: String = "Empty"
     var deck: Deck
     var players: [Player] = []
     
@@ -74,7 +74,7 @@ class Room: NSObject {
     // MARK: Picking
     func startPicking() {
         print("STATE: Picking")
-        state = .Picking
+        state = "Picking"
         
         let question = deck.drawCards(deck.questions, number: 1, remove: false)[0]
         let chooser = setNextChooser()
@@ -89,7 +89,7 @@ class Room: NSObject {
         print("Player \(player) picked \(card)")
         
         // Ensure state, throw exception
-        if state != .Picking || player.pick != nil || !player.hand.contains(card) {
+        if state != "Picking" || player.pick != nil || !player.hand.contains(card) {
             print("ERROR: illegal play from player \(player.domain)")
             return
         }
@@ -119,7 +119,7 @@ class Room: NSObject {
         }
         
         session.publish(name + "/round/choosing", players.map({ $0.pick! }), CHOOSE_TIME)
-        state = .Choosing
+        state = "Choosing"
         startTimer(CHOOSE_TIME, selector: "startScoring:")
     }
     
@@ -141,7 +141,7 @@ class Room: NSObject {
     //MARK: Scoring
     func startScoring(timer: NSTimer) {
         print("STATE: scoring")
-        state = .Scoring
+        state = "Scoring"
         var pickers = players.filter { !$0.chooser }
         
         // if nil, no player was choosen. Autochoose one.

@@ -75,29 +75,6 @@ func getPlayer(players: [Player], domain: String) -> Player {
     return players.filter({$0.domain == domain})[0]
 }
 
-enum State {
-    case Empty, Picking, Choosing, Scoring
-    
-    init?(_ raw: String) {
-        switch raw {
-        case "Empty": self = .Empty;
-        case "Picking": self = .Picking;
-        case "Choosing": self = .Choosing;
-        case "Scoring": self = .Scoring;
-        default: return  nil
-        }
-    }
-    
-    var description : String {
-        switch self {
-            case .Empty: return "Empty";
-            case .Picking: return "Picking";
-            case .Choosing: return "Choosing";
-            case .Scoring: return "Scoring";
-        }
-    }
-}
-
 // Utility function to generate random strings
 func randomStringWithLength (len : Int) -> String {
     
