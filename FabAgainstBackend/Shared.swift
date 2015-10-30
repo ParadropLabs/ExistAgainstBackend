@@ -10,47 +10,20 @@
 import Foundation
 import Riffle
 
-// Representation of a player in the game
 class Player: RiffleModel {
-    var id = Int(arc4random_uniform(UInt32.max))
+    var id = -1
     
     var domain = ""
     var score = 0
     
-    var demo = false
     var chooser = false
     var hand: [Card] = []
     var pick: Card?
-    
-    func toJson() -> [String: AnyObject] {
-        // leftover from the old code
-        let picked = pick == nil ? -1 : pick!.id
-        
-        return [
-            "domain": domain,
-            "score": score,
-            "pick": picked
-        ]
-    }
 }
 
 class Card: RiffleModel {
     var id = -1
     var text = ""
-    
-    class func fromJson(json: [String: AnyObject]) -> Card {
-        let card = Card()
-        card.id = json["id"] as! Int
-        card.text = json["text"] as! String
-        return card
-    }
-    
-    func json() -> [String: AnyObject] {
-        return [
-            "id": id,
-            "text": text
-        ]
-    }
 }
 
 func ==(lhs: Card, rhs: Card) -> Bool {
@@ -67,24 +40,26 @@ class Deck {
     var answers: [Card] = []
     
     init(questionPath: String, answerPath: String) {
-        //Takes the paths of the JSON source files, creates cards
-        
         let load = { (name: String) -> [Card] in
             let jsonPath = NSBundle.mainBundle().pathForResource(name, ofType: "json")
             let x = try! NSJSONSerialization.JSONObjectWithData(NSData(contentsOfFile: jsonPath!)!, options: NSJSONReadingOptions.AllowFragments) as! [[String: AnyObject]]
-            return x.map { Card.fromJson($0) }
+            return x.map({ (json: [String: AnyObject]) -> Card in
+                let card = Card()
+                card.id = json["id"] as! Int
+                card.text = json["text"] as! String
+                return card
+            })
         }
         
         questions = load(questionPath)
         answers = load(answerPath)
     }
     
-    func drawCards(var cards: [Card], number: Int) -> [Card] {
-        // draws a number of cards for the player. Tracks duplicates (?)
+    func drawCards(var cards: [Card], number: Int, remove: Bool = true) -> [Card] {
         var ret: [Card] = []
         
         for _ in 0...number {
-            ret.append(randomElement(&cards, remove: true))
+            ret.append(randomElement(&cards, remove: remove))
         }
         
         return ret

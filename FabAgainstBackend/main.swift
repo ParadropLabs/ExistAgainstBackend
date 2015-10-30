@@ -9,8 +9,17 @@
 import Foundation
 import Riffle
 
+// a silly little hack until I get the prefixes in place
+let ID = "pd.demo.cardsagainst"
+
 let ROOM_CAP = 6
 let HAND_SIZE = 6
+let PICK_TIME = 15.0
+let CHOOSE_TIME = 8.0
+let SCORE_TIME = 3.0
+let EMPTY_TIME = 1.0
+let MIN_PLAYERS = 2
+
 
 class Session: RiffleSession {
     var rooms: [Room] = []
@@ -24,7 +33,7 @@ class Session: RiffleSession {
     }
     
     func getRoom(player: String) -> AnyObject {
-        let emptyRooms = rooms.filter { $0.players.count <= ROOM_CAP }
+        let emptyRooms = rooms.filter { $0.players.count < ROOM_CAP }
         var room: Room
         
         if emptyRooms.count == 0 {
