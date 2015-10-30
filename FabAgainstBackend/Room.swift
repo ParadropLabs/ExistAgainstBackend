@@ -62,6 +62,8 @@ class Room: NSObject {
         print("Player left: " + player.domain)
 
         session.publish(name + "/left", player)
+        deck.reshuffleCards(&deck.answers, cards: player.hand)
+        players.removeObject(player)
         
         // Make sure there are enough players left
         // What if the chooser leaves?
@@ -93,8 +95,6 @@ class Room: NSObject {
         }
         
         player.pick = card
-        player.hand.removeObject(card)
-        
         session.publish(name + "/play/picked", player)
         
         // Check and see if all players have picked cards. If they have, end the round early.
@@ -170,6 +170,7 @@ class Room: NSObject {
         for p in pickers {
             if let c = p.pick {
                 deck.reshuffleCards(&deck.answers, cards: [c])
+                p.hand.removeObject(c)
             }
             
             p.pick = nil
