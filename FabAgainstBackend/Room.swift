@@ -6,47 +6,14 @@
 //  Copyright © 2015 paradrop. All rights reserved.
 //
 
-/*
-    A room is a  game between a limited set of players. Creates a random string
-    which it appends to /room for its endpoints.
-
-    Gameplay proceeds in rounds which consist of phases.
-
-    Publishes on:
-    /room/round/picking
-    /room/round/choosing
-    /room/round/scoring
-    /room/round/cancel
-    /room/round/tick
-
-    /room/joined
-    /room/left
-    /room/closed
-
-    /room/play/picked
-
-    Registers:
-    /room/current
-    /room/play/pick
-*/
 
 import Foundation
-
-let PICK_TIME = 15.0
-let CHOOSE_TIME = 8.0
-let SCORE_TIME = 3.0
-let EMPTY_TIME = 1.0
-let MIN_PLAYERS = 4
-
-// a silly little hack until I get the prefixes in place
-let ID = "pd.demo.cardsagainst"
-
 
 class Room: NSObject {
     var session: Session
     var name = ID + "/room" + randomStringWithLength(6)
     
-    var state: State = .Empty
+    var state: String = "Empty"
     var deck: Deck
     var players: [Player] = []
     
@@ -73,15 +40,12 @@ class Room: NSObject {
         
         // TODO: Assumes no duplicates, obviously
         let player = Player()
+        player.id = Int(arc4random_uniform(UInt32.max))
         player.domain = domain
-        
         players.append(player)
-        session.publish(name + "/joined", domain)
         
-        // Check and see if we need to add players to the room
-        checkDemo()
+        session.publish(name + "/joined", player)
         
-        // Begin the round after we handshake with the player
         defer {
             if players.count > 1 {
                 startTimer(EMPTY_TIME, selector: "startPicking")
@@ -90,55 +54,29 @@ class Room: NSObject {
             }
         }
         
-        print("Adding player \(player)")
-        
-        // Return the player's hand, the current players, and the current state
-        return [
-            players.map { $0.toJson() },
-            String(state),
-            deck.drawCards(deck.answers, number: HAND_SIZE).map { $0.json() },
-            name
-        ]
+        return [players, String(state), deck.drawCards(deck.answers, number: HAND_SIZE), name]
     }
 
-    func checkDemo() {
-        // if there are not enough players to play, add demo players until there are at least MIN_PLAYERS in the room
-//        while players.count < MIN_PLAYERS {
-//            let demo = Player()
-//            demo.demo = true
-//            demo.domain = "Bot--" + randomStringWithLength(3)
-//            demo.hand = deck.drawCards(deck.answers, number: HAND_SIZE)
-//            players.append(demo)
-//            session.publish(name + "/joined", demo.domain)
-//        }
-        
-        // TODO: If there are more than enough players to play, remove extra demo players
-        // Be careful: can't do this in the middle of a round
-    }
     
     func playerLeft(player: Player) {
         print("Player left: " + player.domain)
 
         session.publish(name + "/left", player)
+        deck.reshuffleCards(&deck.answers, cards: player.hand)
+        players.removeObject(player)
         
-        // if there are not enough players remaining add a demo 
-        // Can we do this here? Arbitrarily?
-        checkDemo()
-        
-        // TODO: What if the chooser leaves? Replace with a demo user?
-        // TODO: if there are only demo players left in the room, close the room
+        // Make sure there are enough players left
+        // What if the chooser leaves?
+        // Shuffle the leaver's cards back into the deck
     }
     
     
     // MARK: Picking
     func startPicking() {
         print("STATE: Picking")
-        state = .Picking
+        state = "Picking"
         
-        // TODO: the chooser from the last round should not get a card (no burn)
-        _ = players.map { $0.pick = nil }
-        
-        let question = deck.drawCards(deck.questions, number: 1)[0]
+        let question = deck.drawCards(deck.questions, number: 1, remove: false)[0]
         let chooser = setNextChooser()
         
         print("Next picker set: \(chooser)")
@@ -151,28 +89,16 @@ class Room: NSObject {
         print("Player \(player) picked \(card)")
         
         // Ensure state, throw exception
-        if state != .Picking {
-            print("ERROR: pick called in state \(state)")
-            return
-        }
-        
-        if player.pick != nil {
-            print("Player has already picked a card.")
-            return
-        }
-        
-        if !player.hand.contains(card) {
-            print("Player picked a card they dont have!")
+        if state != "Picking" || player.pick != nil || !player.hand.contains(card) {
+            print("ERROR: illegal play from player \(player.domain)")
             return
         }
         
         player.pick = card
-        player.hand.removeObject(card)
-        
         session.publish(name + "/play/picked", player)
         
         // Check and see if all players have picked cards. If they have, end the round early.
-        let notPicked = players.filter { $0.pick == nil && $0.domain != getChooser()!.domain}
+        let notPicked = players.filter { $0.pick == nil && $0 != getChooser()! }
         
         if notPicked.count == 0 {
             print("All players picked. Ending timer early. ")
@@ -184,38 +110,20 @@ class Room: NSObject {
     // MARK: Choosing
     func startChoosing() {
         print("STATE: choosing")
+
+         for p in players {
+            if p.pick == nil {
+                p.pick = randomElement(&p.hand, remove: true)
+                session.publish(name + "/play/picked", p.pick!)
+            }
+        }
         
-        // Autoassign picks for the user if they habd not yet submitted
-        // TODO: inform them off the autopick
-        // for p in players {
-        //    if p.pick == -1 {
-        //        p.pick = randomElement(deck.answers).id
-        //    }
-        //}
-        
-        // publish the picks-- with mantle changes this should turn into direct object transference
-        
-        // get the cards from the ids of the picks
-        let cards = players.map { $0.pick }
-        let ret: [Card] = cards.filter { $0 != nil } as! [Card]
-        
-//        var ret : [AnyObject] = []
-//        for p in players {
-//            let cards = deck.answers.filter {$0.id == p.pick }
-//            
-//            if cards.count == 1 {
-//                ret.append(cards[0].json())
-//            }
-//        }
-        
-        session.publish(name + "/round/choosing", ret, CHOOSE_TIME)
-        
-        state = .Choosing
+        session.publish(name + "/round/choosing", players.map({ $0.pick! }), CHOOSE_TIME)
+        state = "Choosing"
         startTimer(CHOOSE_TIME, selector: "startScoring:")
     }
     
     func choose(card: Card) {
-        // find the person who played this card
         let picks = players.filter { $0.pick == card }
         
         if picks.count == 0 {
@@ -226,7 +134,6 @@ class Room: NSObject {
         }
         
         print("Winner choosen: " + picks[0].domain)
-        
         startTimer(0.0, selector: "startScoring:", info: picks[0].domain)
     }
     
@@ -234,12 +141,12 @@ class Room: NSObject {
     //MARK: Scoring
     func startScoring(timer: NSTimer) {
         print("STATE: scoring")
-        state = .Scoring
+        state = "Scoring"
+        var pickers = players.filter { !$0.chooser }
         
         // if nil, no player was choosen. Autochoose one.
         var player: Player?
-        if let info = timer.userInfo {
-            let domain = info as! String
+        if let domain = timer.userInfo as? String {
             let filters = players.filter { $0.domain == domain }
             
             // Make sure we weren't lied to
@@ -248,27 +155,27 @@ class Room: NSObject {
             } else {
                 player = filters[0]
             }
-            
-        } else {
-            var submitted = players.filter { $0.pick != -1 }
-            
-            if submitted.count != 0 {
-                print("No player choosen. Selecting one at random from those that submitted")
-                player = randomElement(&submitted)
-            }
         }
         
-        // We have a winner or not. Publish.
-        if let p = player {
-            p.score += 1
-            session.publish(name + "/round/scoring", p.domain, SCORE_TIME)
-        } else {
-            print("No players picked cards! No winers found. ")
-            session.publish(name + "/round/scoring", "", SCORE_TIME)
+        // Choose a winner at random
+        if player == nil {
+             print("No players picked cards! Choosing one at random")
+            player = randomElement(&pickers)
         }
+        
+        player!.score += 1
+        session.publish(name + "/round/scoring", player!, SCORE_TIME)
 
         // draw cards for all players
-        _ = players.map { session.call($0.domain + "/draw", deck.drawCards(deck.answers, number: 1)[0], handler:nil) }
+        for p in pickers {
+            if let c = p.pick {
+                deck.reshuffleCards(&deck.answers, cards: [c])
+                p.hand.removeObject(c)
+            }
+            
+            p.pick = nil
+            session.call(p.domain + "/draw", deck.drawCards(deck.answers, number: 1)[0], handler:nil)
+        }
         
         startTimer(SCORE_TIME, selector: "startPicking")
     }

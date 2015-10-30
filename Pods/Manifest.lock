@@ -6,7 +6,19 @@ PODS:
   - Mantle/extobjc (1.5)
   - MPMessagePack (1.3.2):
     - GHODictionary
-  - Riffle (0.1.2):
+  - Riffle (0.1.32):
+    - CocoaAsyncSocket (= 7.4.1)
+    - Mantle (= 1.5)
+    - MPMessagePack (= 1.3.2)
+    - Riffle/ios (= 0.1.32)
+    - Riffle/osx (= 0.1.32)
+    - SocketRocket (= 0.4.1)
+  - Riffle/ios (0.1.32):
+    - CocoaAsyncSocket (= 7.4.1)
+    - Mantle (= 1.5)
+    - MPMessagePack (= 1.3.2)
+    - SocketRocket (= 0.4.1)
+  - Riffle/osx (0.1.32):
     - CocoaAsyncSocket (= 7.4.1)
     - Mantle (= 1.5)
     - MPMessagePack (= 1.3.2)
@@ -14,23 +26,14 @@ PODS:
   - SocketRocket (0.4.1)
 
 DEPENDENCIES:
-  - Riffle (from `https://github.com/ParadropLabs/riffle-swift`)
-
-EXTERNAL SOURCES:
-  Riffle:
-    :git: https://github.com/ParadropLabs/riffle-swift
-
-CHECKOUT OPTIONS:
-  Riffle:
-    :commit: 42353b96e52c2c02cd33fac17e31f30446d8bf5a
-    :git: https://github.com/ParadropLabs/riffle-swift
+  - Riffle
 
 SPEC CHECKSUMS:
   CocoaAsyncSocket: 7cbf214b27f8e7f7574db6a3fd96352ffaed433d
   GHODictionary: 1f7873492445e0f33ac19575a358c3c91926b564
   Mantle: 3bf6db311c8b4a19b6be01f2483fa4590aa166f3
   MPMessagePack: 23bbb933ef1046edcf104e3556ab4a6b4b0a69d4
-  Riffle: 5894b95d34519c7cd9bdaf7b9edf6c0b96b2e423
+  Riffle: c6300e7e1dd96a52e06a0973a28e057796ecfff5
   SocketRocket: ee0b5c34182d37bb4f1f8d628bbe737718126daa
 
-COCOAPODS: 0.38.2
+COCOAPODS: 0.39.0

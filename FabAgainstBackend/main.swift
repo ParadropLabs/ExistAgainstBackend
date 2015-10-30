@@ -9,8 +9,17 @@
 import Foundation
 import Riffle
 
+// a silly little hack until I get the prefixes in place
+let ID = "pd.demo.cardsagainst"
+
 let ROOM_CAP = 6
 let HAND_SIZE = 6
+let PICK_TIME = 15.0
+let CHOOSE_TIME = 8.0
+let SCORE_TIME = 3.0
+let EMPTY_TIME = 1.0
+let MIN_PLAYERS = 2
+
 
 class Session: RiffleSession {
     var rooms: [Room] = []
@@ -23,10 +32,8 @@ class Session: RiffleSession {
         register("pd.demo.cardsagainst/play", getRoom)
     }
     
-    func getRoom(player: NSString) -> AnyObject {
-        // Assign the player to a room. Returns cards for the player
-        
-        let emptyRooms = rooms.filter { $0.players.count <= ROOM_CAP }
+    func getRoom(player: String) -> AnyObject {
+        let emptyRooms = rooms.filter { $0.players.count < ROOM_CAP }
         var room: Room
         
         if emptyRooms.count == 0 {
@@ -36,8 +43,6 @@ class Session: RiffleSession {
             room = emptyRooms[Int(arc4random_uniform(UInt32(emptyRooms.count)))]
         }
         
-        // very strange exec_bad_access if you just return the element right away.
-        // Started when I converted the roomclass to an NSObject subclass. No idea....
         let x = room.addPlayer(player as String)
         return x
     }
