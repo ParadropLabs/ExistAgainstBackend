@@ -37,10 +37,17 @@ class Room: NSObject {
     }
     
     // MARK: Player Changes
-    func addPlayer(domain: String) -> [AnyObject] {
+    func addPlayer(domain: String) -> [AnyObject]? {
         print("Adding Player \(domain)")
         // Called from main session when player assigned to the room
         // Returns the information the player needs to get up to date
+
+        let existing = players.filter { $0.domain == domain }
+        
+        if existing.count != 0 {
+            print("WARNING: player \(domain) already exists in room \(name)")
+            return nil
+        }
         
         // TODO: Assumes no duplicates, obviously
         let player = Player()

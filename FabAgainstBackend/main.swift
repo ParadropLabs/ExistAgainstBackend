@@ -43,8 +43,12 @@ class Session: RiffleSession {
             room = emptyRooms[Int(arc4random_uniform(UInt32(emptyRooms.count)))]
         }
         
-        let x = room.addPlayer(player as String)
-        return x
+        if let x = room.addPlayer(player) {
+            return x
+        }
+        
+        // This is temporary-- have to catch errors thrown on wrong numbers of args and call errors accordingly
+        return [false, false, false, false]
     }
 }
 

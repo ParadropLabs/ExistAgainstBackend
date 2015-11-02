@@ -90,6 +90,7 @@ func randomStringWithLength (len : Int) -> String {
 }
 
 func randomElement<T>(inout arr: [T], remove: Bool = false) -> T {
+    // fails if the array is empty
     let i = Int(arc4random_uniform(UInt32(arr.count)))
     let o = arr[i]
     
