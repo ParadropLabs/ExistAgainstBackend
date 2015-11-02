@@ -20,8 +20,8 @@ import Foundation
 import Mantle
 
 func convert<A: AnyObject, T: Cuminicable>(a: A?, _ t: T.Type) -> T? {
-    print("Expecting: \(T.self)")
-    print("Incoming: \(a)")
+    //print("Expecting: \(T.self)")
+    //print("Incoming: \(a)")
     
     if let x = a {
         let ret = t.convert(x)
