@@ -19,6 +19,15 @@ class Player: RiffleModel {
     var chooser = false
     var hand: [Card] = []
     var pick: Card?
+    
+    override static func JSONKeyPathsByPropertyKey() -> [NSObject : AnyObject]!  {
+        // By default, do not pass along nested model objects
+        
+        var keys = super.JSONKeyPathsByPropertyKey()
+        keys["hand"] = NSNull()
+        keys["pick"] = NSNull()
+        return keys
+    }
 }
 
 class Card: RiffleModel {
@@ -32,43 +41,6 @@ func ==(lhs: Card, rhs: Card) -> Bool {
 
 func ==(lhs: Player, rhs: Player) -> Bool {
     return lhs.domain == rhs.domain
-}
-
-
-class Deck {
-    var questions: [Card] = []
-    var answers: [Card] = []
-    
-    init(questionPath: String, answerPath: String) {
-        let load = { (name: String) -> [Card] in
-            let jsonPath = NSBundle.mainBundle().pathForResource(name, ofType: "json")
-            let x = try! NSJSONSerialization.JSONObjectWithData(NSData(contentsOfFile: jsonPath!)!, options: NSJSONReadingOptions.AllowFragments) as! [[String: AnyObject]]
-            return x.map({ (json: [String: AnyObject]) -> Card in
-                let card = Card()
-                card.id = json["id"] as! Int
-                card.text = json["text"] as! String
-                return card
-            })
-        }
-        
-        questions = load(questionPath)
-        answers = load(answerPath)
-    }
-    
-    func drawCards(var cards: [Card], number: Int, remove: Bool = true) -> [Card] {
-        var ret: [Card] = []
-        
-        for _ in 0...number {
-            ret.append(randomElement(&cards, remove: remove))
-        }
-        
-        return ret
-    }
-    
-    func reshuffleCards(inout target: [Card], cards: [Card]) {
-        // "Realease" the cards formerly in play by shuffling them back into the deck 
-        target.appendContentsOf(cards)
-    }
 }
 
 func getPlayer(players: [Player], domain: String) -> Player {
@@ -90,7 +62,6 @@ func randomStringWithLength (len : Int) -> String {
 }
 
 func randomElement<T>(inout arr: [T], remove: Bool = false) -> T {
-    // fails if the array is empty
     let i = Int(arc4random_uniform(UInt32(arr.count)))
     let o = arr[i]
     
