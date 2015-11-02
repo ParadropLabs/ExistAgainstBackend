@@ -29,8 +29,12 @@ class Room: NSObject {
         session.register(name + "/leave", playerLeft)
         session.register(name + "/play/pick", pick)
         session.subscribe(name + "/play/choose", choose)
+        session.subscribe(ID + "/sessionLeft", sessionLeft)
     }
     
+    func sessionLeft(domain: String) {
+        print("Session left: /(domain)")
+    }
     
     // MARK: Player Changes
     func addPlayer(domain: String) -> [AnyObject] {
@@ -54,9 +58,8 @@ class Room: NSObject {
             }
         }
         
-        return [players, String(state), deck.drawCards(deck.answers, number: HAND_SIZE), name]
+        return [deck.drawCards(deck.answers, number: HAND_SIZE), players, String(state), name]
     }
-
     
     func playerLeft(player: Player) {
         print("Player left: " + player.domain)

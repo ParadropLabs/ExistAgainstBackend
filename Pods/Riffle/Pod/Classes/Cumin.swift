@@ -90,6 +90,8 @@ public func serialize(args: [AnyObject]) -> [AnyObject] {
     for a in args {
         if let object = a as? RiffleModel {
             ret.append(MTLJSONAdapter.JSONDictionaryFromModel(object))
+        } else if let objects = a as? [RiffleModel] {
+            ret.append(MTLJSONAdapter.JSONArrayFromModels(objects))
         } else {
             ret.append(a)
         }
