@@ -33,7 +33,7 @@ class Room: NSObject {
     }
     
     func sessionLeft(domain: String) {
-        print("Session left: /(domain)")
+        print("Session left: \(domain)")
     }
     
     // MARK: Player Changes
