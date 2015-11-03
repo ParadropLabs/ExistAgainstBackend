@@ -78,7 +78,7 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
     func _subscribe(endpoint: String, fn: ([AnyObject]) throws -> ()) {
         // This is the real subscrive method
         session.subscribe(endpoint, onEvent: { (event: MDWampEvent!) -> Void in
-
+            
             do {
                 try fn(event.arguments)
             } catch CuminError.InvalidTypes(let expected, let recieved) {
@@ -87,11 +87,11 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
                 print("PANIC! Unknown exception!")
             }
             
-        })
-        { (err: NSError!) -> Void in
+            })
+            { (err: NSError!) -> Void in
                 if let e = err {
                     print("An error occured: ", e)
-            }
+                }
         }
     }
     
@@ -110,11 +110,11 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
             
             }, cancelHandler: { () -> Void in
                 print("Register Cancelled!")
-        })
-        { (err: NSError!) -> Void in
-            if err != nil {
-                print("Error registering endoing: \(endpoint), \(err)")
-            }
+            })
+            { (err: NSError!) -> Void in
+                if err != nil {
+                    print("Error registering endoing: \(endpoint), \(err)")
+                }
         }
     }
     
@@ -141,11 +141,11 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
             
             }, cancelHandler: { () -> Void in
                 print("Register Cancelled!")
-        })
-        { (err: NSError!) -> Void in
-            if err != nil {
-                print("Error registering endoing: \(endpoint), \(err)")
-            }
+            })
+            { (err: NSError!) -> Void in
+                if err != nil {
+                    print("Error registering endoing: \(endpoint), \(err)")
+                }
         }
     }
     
@@ -181,10 +181,18 @@ public class RiffleSession: NSObject, MDWampClientDelegate, RiffleDelegate {
     }
     
     public func unregister(endpoint: String) {
-        session.unregisterRPC(endpoint, result: nil)
+        session.unregisterRPC(endpoint) { (err: NSError!) -> Void in
+            if let e = err {
+                print("WARN: error occured while unregistering endpoint \(endpoint): \(e)")
+            }
+        }
     }
     
     public func unsubscribe(endpoint: String) {
-        session.unsubscribe(endpoint, result: nil)
+        session.unsubscribe(endpoint) { (err: NSError!) -> Void in
+            if let e = err {
+                print("WARN: error occured while unregistering endpoint \(endpoint): \(e)")
+            }
+        }
     }
 }

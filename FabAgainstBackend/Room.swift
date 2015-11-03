@@ -51,8 +51,11 @@ class Room: NSObject {
         
         // TODO: Assumes no duplicates, obviously
         let player = Player()
+        let hand = deck.drawCards(deck.answers, number: HAND_SIZE)
+        
         player.id = Int(arc4random_uniform(UInt32.max))
         player.domain = domain
+        player.hand = hand
         players.append(player)
         
         session.publish(name + "/joined", player)
@@ -65,7 +68,7 @@ class Room: NSObject {
             }
         }
         
-        return [deck.drawCards(deck.answers, number: HAND_SIZE), players, String(state), name]
+        return [hand, players, String(state), name]
     }
     
     func playerLeft(player: Player) {
@@ -89,14 +92,23 @@ class Room: NSObject {
         let question = deck.drawCards(deck.questions, number: 1, remove: false)[0]
         let chooser = setNextChooser()
         
-        print("Next picker set: \(chooser)")
+        print("Next picker set: \(chooser.domain)")
 
         session.publish(name + "/round/picking", chooser, question, PICK_TIME)
         startTimer(PICK_TIME, selector: "startChoosing")
     }
     
-    func pick(player: Player, card: Card) {
-        print("Player \(player) picked \(card)")
+    func pick(sender: Player, card: Card) {
+        // The incoming player is THEIR perspective, not ours
+        var allPlayers = players.filter { $0.domain == sender.domain }
+        
+        if allPlayers.count != 1 {
+            print("WARN: someone picking with a name not found in locals!")
+            return
+        }
+        
+        let player = allPlayers[0]
+        print("Player \(player.domain) picked \(card)")
         
         // Ensure state, throw exception
         if state != "Picking" || player.pick != nil || !player.hand.contains(card) {
@@ -120,15 +132,22 @@ class Room: NSObject {
     // MARK: Choosing
     func startChoosing() {
         print("STATE: choosing")
-
-         for p in players {
-            if p.pick == nil {
-                p.pick = randomElement(&p.hand, remove: true)
-                session.publish(name + "/play/picked", p.pick!)
-            }
-        }
         
-        session.publish(name + "/round/choosing", players.map({ $0.pick! }), CHOOSE_TIME)
+        let picks = players.filter { (player: Player) -> Bool in
+            !player.chooser
+        }.map { (player: Player) -> Card in
+            var pick = player.pick
+            
+            if pick == nil {
+                pick = randomElement(&player.hand, remove: true)
+                player.pick = pick
+            }
+            
+            //session.publish(name + "/play/picked", pick)
+            return pick!
+        }
+
+        session.publish(name + "/round/choosing", picks, CHOOSE_TIME)
         state = "Choosing"
         startTimer(CHOOSE_TIME, selector: "startScoring:")
     }
